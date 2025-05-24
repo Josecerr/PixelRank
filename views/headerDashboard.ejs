@@ -1,0 +1,92 @@
+
+<!--Uso del framework-->
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+<header id="index-header">
+
+    <div id="title">
+
+        <h1>PixelRank</h1>
+
+        <form class="w-100px">   
+            <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                    </svg>
+                </div>
+                <input type="search" id="default-search" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder=" Videogames are waiting.." required />
+                <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" id="searchGame">Search</button>
+            </div>
+        </form>
+
+    </div>
+
+
+    <!-- Dashboard Header layout -->
+    <!--Using TAILWIND-->
+    <nav id="navegation" class="text-white items-center flex gap-2">
+
+
+        <div class="relative">
+            <button id="profile" class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600 focus:outline-none">
+                <div class="flex items-center gap-2">
+                    <img class="w-9 h-9 rounded-full ring-2 ring-white" id="img-data-user" src="" alt="" >
+                    <span>Profile</span>
+                </div>
+            </button>
+
+            <div id="dropdown-menu"
+                class="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg hidden z-10">
+                <a href="#" class="block px-4 py-2 hover:bg-gray-100">
+                    <div class="flex items-center gap-1" id="myAccount">
+                        <img class="w-5 h-5 rounded-full ring-2 ring-white" src="/images/account-settings.png">
+                        <span> My Account</span>
+                    </div>
+                </a>
+
+
+                <a href="#" class="block px-4 py-2 hover:bg-gray-100">
+
+                    <div class="flex items-center gap-1">
+                        <img class="w-5 h-5 rounded-full ring-2 ring-white border-none" src="/images/plus.png">
+                        <span> Add Friends</span>
+                    </div>
+                </a>
+                <a href="#" class="block px-4 py-2 hover:bg-gray-100">
+                    <div class="flex items-center gap-1" id="logout">
+                        <img class="w-5 h-5 rounded-full ring-2 ring-white" src="/images/leave.png">
+                        <span> Logout</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <button class="flex items-center">My Library</button>
+
+        <button id="discord-button">
+            <img src="/images/dclogo.png" alt="discord">
+        </button>
+
+
+    </nav>
+
+
+    <script>
+        const profileBtn = document.getElementById('profile');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+
+        profileBtn.addEventListener('click', () => {
+            dropdownMenu.classList.toggle('hidden');
+        });
+
+
+        document.addEventListener('click', (event) => {
+            if (!profileBtn.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    </script>
+
+</header>

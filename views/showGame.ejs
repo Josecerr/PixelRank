@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/stylesheets/dashboard/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body>
+    <%- include('headerDashboard') %>
+
+        <div class="grid grid-cols-2" id="navBarBackground"> <!--Nav bar lateral + background games-->
+
+            <div id="navBar">
+
+
+                <div id="options">
+                    <h3>Platforms</h3>
+
+
+
+                </div>
+
+
+
+
+
+            </div>
+
+            <div id="game-general">
+
+                <div id="game-content">
+
+
+                    <div id="game-header">
+
+                        <div id="game-header-title">
+                            <img src="/images/arrowBackPn.png" id="goBack">
+                            <h1 id="gameName"></h1>
+                        </div>
+
+                        <p id="releaseDate"></p>
+                    </div>
+
+                    <div id="game-info">
+                        <img id="game-cover" src="" alt="Cover Image" />
+                        <p id="game-description"></p>
+                    </div>
+
+                    <div id="captures-section">
+                        <h2 id="trailers">Trailers</h2>
+                        <div id="videos-container"></div>
+                        <h2>Screenshots</h2>
+                        <div id="captures-container"></div>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+        <script>
+
+
+            window.gameData = <%- JSON.stringify(game) %>;
+
+
+        </script>
+
+        <script src="/javascripts/gamesDetails/gameShow.js" type="module"></script>
+</body>
+
+</html>
