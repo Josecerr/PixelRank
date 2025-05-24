@@ -1,8 +1,10 @@
+
 import { updateUser } from "../indexFunctions/register-login/auth.js";
 const myAccount = document.getElementById('myAccount');
 const game = window.gameData;
 console.log(game); // objeto completo
 const user = JSON.parse(localStorage.getItem('user'));
+
 
 const buttonSearchGame = document.getElementById('searchGame');
 
@@ -16,6 +18,9 @@ goBack.addEventListener('mouseover', () => {
 
 })
 
+setInterval(() => {
+    showReviewsComplete();
+}, 30000);
 
 
 
@@ -160,9 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
     //debugging
     console.log(game.description);
 
+    showReviewsComplete();
 
 
-
+    showReviews();
 
 
 
@@ -263,6 +269,204 @@ function showInformation() {
 
 }
 
+
+function showReviews() {
+
+
+    const reviewGame = document.getElementById('review-data');
+
+
+
+
+    const textArea = document.createElement('textarea');
+    textArea.placeholder = "Write your review here";
+    textArea.style.backgroundColor = "white";
+
+
+
+
+
+
+
+
+
+    reviewGame.appendChild(textArea);
+
+
+    const sendReview = document.getElementById("sendReview");
+
+
+    sendReview.addEventListener('click', () => {
+        const rating = document.querySelector('input[name="rating"]:checked')?.value;
+        alert(rating);
+
+        const dataBod = {
+
+            review: textArea.value,
+            userId: user.id,
+            gameId: game.id,
+            rating: rating
+
+        }
+
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataBod)
+        };
+
+
+        fetch('/users/postReview', requestOptions)
+            .then(response => {
+
+                if (!response.ok) {
+
+                    throw new Error("Error, no answer in the Backend");
+
+                }
+
+                return response.json();
+
+            })
+            .then(data => {
+
+                if (data.success) {
+
+                    const p = document.createElement('p');
+                    p.textContent = " ";
+                    p.textContent = "Review sent succesfully";
+                    p.style.fontFamily = "play";
+                    p.style.fontSize = "2vh";
+                    p.style.color = "white";
+
+                    reviewGame.appendChild(p);
+
+                    showReviewsComplete();
+
+                }
+
+
+            })
+
+
+    })
+
+
+}
+
+function showReviewsComplete() {
+
+    const reviewData = document.getElementById('show-reviews');
+    reviewData.textContent = "";
+
+    const dataBod = {
+
+        gameId: game.id
+
+    }
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataBod)
+    };
+
+    fetch('/getGames/obtenerResenas', requestOptions)
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error("Error getting data");
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(result => {
+
+            if (result.length === 0) {
+
+
+
+            } else {
+
+                result.forEach(review => {
+
+                    const reviewContainer = document.createElement('div');
+                    reviewContainer.style.display = "flex";
+                    reviewContainer.style.alignItems = "flex-start";
+                    reviewContainer.style.backgroundColor = "#1c1c1c";
+                    reviewContainer.style.borderRadius = "12px";
+                    reviewContainer.style.padding = "15px";
+                    reviewContainer.style.marginBottom = "15px";
+                    reviewContainer.style.gap = "15px";
+                    reviewContainer.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.5)";
+
+                    // Avatar
+                    const avatar = document.createElement('img');
+                    avatar.src = review.avatar || '/default-avatar.png';
+                    avatar.alt = "User Avatar";
+                    avatar.style.width = "60px";
+                    avatar.style.height = "60px";
+                    avatar.style.borderRadius = "50%";
+                    avatar.style.objectFit = "cover";
+                    reviewContainer.appendChild(avatar);
+
+                    // Text content
+                    const content = document.createElement('div');
+                    content.style.display = "flex";
+                    content.style.flexDirection = "column";
+                    content.style.justifyContent = "center";
+                    content.style.flex = "1";
+
+                    const username = document.createElement('strong');
+                    username.textContent = review.username || "Anonymous";
+                    username.style.color = "#00ffff";
+                    username.style.fontSize = "1.2em";
+                    username.style.fontFamily = "play";
+
+                    const rating = document.createElement('span');
+                    rating.textContent = `Rating: ${review.rating}/5`;
+                    rating.style.color = "#ffd700";
+                    rating.style.fontFamily = "play";
+                    rating.style.marginTop = "4px";
+
+                    const text = document.createElement('p');
+                    text.textContent = review.comment;
+                    text.style.color = "white";
+                    text.style.marginTop = "10px";
+                    text.style.fontFamily = "play";
+                    text.style.lineHeight = "1.4";
+
+                    content.appendChild(username);
+                    content.appendChild(rating);
+                    content.appendChild(text);
+
+                    reviewContainer.appendChild(content);
+                    reviewData.appendChild(reviewContainer);
+
+
+
+
+
+                })
+
+
+            }
+
+
+
+        })
+
+
+
+}
 
 myAccount.addEventListener('click', () => {
 

@@ -189,7 +189,7 @@ body {
     padding-bottom: 1rem;
 }
 
-#game-header-title{
+#game-header-title {
 
     align-items: center;
     justify-content: center;
@@ -255,22 +255,124 @@ body {
 }
 
 #goBack {
-    width: 40px; /* ajusta según necesites */
+    width: 40px;
+    /* ajusta según necesites */
     height: 40px;
-    background-color: white; /* color que rellena el interior de la flecha */
-  
-    
+    background-color: white;
+    /* color que rellena el interior de la flecha */
+
+
     -webkit-mask-image: url('/images/arrowBackPn.png');
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-size: contain;
     mask-image: url('/images/arrowBackPn.png');
     mask-repeat: no-repeat;
     mask-size: contain;
-  
+
     /* Ocultamos el contenido de la imagen (el src no se verá) */
     content: '';
     display: inline-block;
-  }
+}
+
+#review-data {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+
+}
+
+
+#review-data textarea {
+    width: 50%;
+    height: 40vh;
+    background-color: #1e1e1e;
+    /* gris oscuro para contraste */
+    color: black;
+    /* texto claro */
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    resize: vertical;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+#review-data textarea:focus {
+    outline: none;
+    border-color: #ffc107;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.6);
+}
+
+.star-rating {
+    font-size: 2rem;
+    unicode-bidi: bidi-override;
+    direction:rtl;
+    display: block;
+    margin: 0 auto;
+    /* centra horizontalmente */
+    width: fit-content;
+}
+
+#send-review {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 5vh;
+}
+
+#send-review #sendReview{
+    width: 20%;
+    height: 5vh;
+    background-color:rgba(255, 193, 7, 0.6) ;
+    font-family: "play";
+    color: white;
+    border-radius: 20px;
+
+
+}
+
+.star-rating input {
+    display: none;
+    /* Ocultamos los radio buttons */
+}
+
+.star-rating label {
+    color: white;
+    /* Estrellas blancas por defecto */
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+/* Hover: cambia el color de la estrella bajo el cursor y las anteriores */
+.star-rating label:hover,
+.star-rating label:hover~label {
+    color: gold;
+}
+
+/* Checked: cuando se selecciona una estrella, esa y todas las anteriores se quedan amarillas */
+.star-rating input:checked~label {
+    color: white;
+    /* Reinicio a blanco */
+}
+
+.star-rating input:checked+label,
+.star-rating input:checked+label~label {
+    color: gold;
+}
+#welcome-reviews{
+
+    font-family: "play";
+    color:white;
+    font-size: 6vh;
+
+
+}
 
 @keyframes showUp {
     0% {

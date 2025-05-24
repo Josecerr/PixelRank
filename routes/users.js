@@ -21,12 +21,12 @@ router.post('/register', async (req, res) => {
 
         const userId = result.insertId;
 
-     
+
         const user = await connBBDD.getUserById(userId);
 
-        req.session.user=user;
+        req.session.user = user;
 
-        
+
         res.json({ success: true, message: 'Usuario registrado exitosamente', user: user });
 
 
@@ -109,14 +109,30 @@ router.post('/update', upload.single('avatar'), async (req, res) => {
 });
 router.get('/profile', (req, res) => {
     if (!req.session.user) {
-        
+
         return res.status(401).json({ success: false, message: 'No autorizado' });
     }
     res.json({ success: true, user: req.session.user });
 });
 
+router.post('/postReview', async (req, res) => {
+    const { review, userId, gameId, rating } = req.body;
+
+    const result = await connBBDD.postReview(review, userId, gameId, rating);
+
+    if (result.affectedRows === 0) {
+
+        res.status(401).json({ error: "Error posting the review" });
+
+    }
+
+    res.json({ success: true});
+
+
+})
+
 router.get('/logout', async (req, res) => {
-    
+
     res.render('index.ejs');
 
 });

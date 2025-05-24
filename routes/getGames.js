@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const rawgApi = require('../public/services/rawgApi');
+const connBBDD = require('../dao/connBBDD');
 
 router.get('/mostrar', async (req, res) => {
   try {
@@ -45,32 +46,53 @@ router.post('/mostrarTrailers', async (req, res) => {
     const trailers = await rawgApi.obtenerTrailers(gameId);
 
     res.json(trailers);
-  }catch(err){
+  } catch (err) {
 
-    res.status(500).json({error : 'No se pudo obtener los trailers'});
+    res.status(500).json({ error: 'No se pudo obtener los trailers' });
 
   }
 
 })
 
-router.post('/busquedaJuego', async(req,res)=>{
-  console.log('Body recibido:', req.body); 
-  const{nombreJuego}=req.body;
+router.post('/busquedaJuego', async (req, res) => {
+  console.log('Body recibido:', req.body);
+  const { nombreJuego } = req.body;
 
-  try{
+  try {
 
-    const result=await rawgApi.obtenerJuegoPorNombre(nombreJuego);
+    const result = await rawgApi.obtenerJuegoPorNombre(nombreJuego);
 
     res.json(result);
 
-  }catch(err){
+  } catch (err) {
 
-    res.status(500).json({error : 'No se pudo obtener el juego'});
+    res.status(500).json({ error: 'No se pudo obtener el juego' });
 
   }
 
 
 })
 
+
+
+router.post('/obtenerResenas', async (req, res) => {
+
+  const { gameId } = req.body;
+
+  try{
+
+    const result=await connBBDD.getReviews(gameId);
+
+    res.json(result);
+
+
+  }catch(err){
+
+    res.status(500).json({error: 'Error obteniendo reseñas'});
+
+  }
+
+
+})
 
 module.exports = router;

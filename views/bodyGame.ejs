@@ -1,0 +1,105 @@
+<body>
+
+
+    <div class="grid grid-cols-2" id="navBarBackground"> <!--Nav bar lateral + background games-->
+
+        <div id="navBar">
+
+
+            <div id="options">
+                <h3>Platforms</h3>
+
+
+
+            </div>
+
+
+
+
+
+        </div>
+
+        <div id="game-general">
+
+            <div id="game-content">
+
+
+                <div id="game-header">
+
+                    <div id="game-header-title">
+                        <img src="/images/arrowBackPn.png" id="goBack">
+                        <h1 id="gameName"></h1>
+                    </div>
+
+                    <p id="releaseDate"></p>
+                </div>
+
+                <div id="game-info">
+                    <img id="game-cover" src="" alt="Cover Image" />
+                    <p id="game-description"></p>
+                </div>
+
+                <div id="captures-section">
+                    <h2 id="trailers">Trailers</h2>
+                    <div id="videos-container"></div>
+                    <h2>Screenshots</h2>
+                    <div id="captures-container"></div>
+
+                </div>
+                <div id="review-aboutGame">
+
+                    <h2 id="welcome-reviews">Reviews</h2>
+                    <div id="show-reviews">
+
+
+
+
+
+                    </div>
+
+                    <div id="review-data">
+
+
+                    </div>
+
+                    <form class="star-rating">
+
+
+                        <label for="star5" title="5 estrellas">★</label>
+                        <input type="radio" id="star5" name="rating" value="5">
+
+                        <label for="star4" title="4 estrellas">★</label>
+                        <input type="radio" id="star4" name="rating" value="4">
+                        <label for="star3" title="3 estrellas">★</label>
+                        <input type="radio" id="star3" name="rating" value="3">
+
+                        <label for="star2" title="2 estrellas">★</label>
+                        <input type="radio" id="star2" name="rating" value="2">
+
+                        <label for="star1" title="1 estrella">★</label>
+                        <input type="radio" id="star1" name="rating" value="1">
+                    </form>
+                    <div id="send-review">
+                        <button type="submit" id="sendReview" value="Send Review!">Send Review!</button>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+    <script>
+
+
+        window.gameData = <%- JSON.stringify(game) %>;
+
+
+    </script>
+
+    <script src="/javascripts/gamesDetails/gameShow.js" type="module"></script>
+</body>
