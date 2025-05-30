@@ -61,6 +61,7 @@ export function loginProcess(email, password, errorMessage) {
         headers: {
             'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(dataBod)
     })
         .then(response => response.json())
@@ -73,7 +74,7 @@ export function loginProcess(email, password, errorMessage) {
             //Al llevarlo el backend, no hace falta ningun control aqui. solo asegurarnos de que las solicitudes son correctas
             if (data.success) {
                 console.log(data.user);
-                localStorage.setItem('user', JSON.stringify(data.user));
+
                 window.location.href = '/dashboard'; // Redirige a la vista del dashboard
             } else {
 
@@ -111,19 +112,22 @@ export function updateUser(userId, avatarInput) {
         .then(data => {
             console.log('Avatar actualizado:', data);
 
-            // Actualiza el localStorage con la nueva URL
-            const user = JSON.parse(localStorage.getItem('user'));
-            user.avatar = data.avatar;
-            localStorage.setItem('user', JSON.stringify(user));
 
-            // Actualiza la imagen en la interfaz si es necesario
-            document.getElementById('img-data-user').src = data.avatar;
+
+
+            document.getElementById('img-data-user').src = data.avatar + '?t=' + new Date().getTime();
+
+            document.getElementById('avatarUser').src = data.avatar;
+
+            const modal = document.getElementById('modal-edit-account');
+
+            document.body.removeChild(modal);
 
 
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error al actualizar el avatar');
+            
         });
 }
 

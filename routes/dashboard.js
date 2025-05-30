@@ -3,8 +3,12 @@ const router = express.Router();
 
 // Definir la ruta para /dashboard
 router.get('/', (req, res) => {
-    res.render('dashboard');  // Aquí renderizas la vista dashboard
-});
+    if (!req.session.user) {
+        return res.redirect('/'); // o redirige a /login si prefieres
+    }
 
+    res.render('dashboard', { user: req.session.user }); // Pasa el usuario a la vista
+});
+  
 // Asegúrate de exportar el router correctamente
 module.exports = router;

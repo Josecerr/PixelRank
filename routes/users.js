@@ -23,8 +23,13 @@ router.post('/register', async (req, res) => {
 
 
         const user = await connBBDD.getUserById(userId);
-
-        req.session.user = user;
+        //Datos sencillos, no peligrosos
+        req.session.user = {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            avatar: user.avatar
+        };
 
 
         res.json({ success: true, message: 'Usuario registrado exitosamente', user: user });
@@ -55,6 +60,12 @@ router.post('/login', async (req, res) => {
 
         if (result.success) {
 
+            req.session.user = {
+                id: user.id,
+                email: user.email,
+                username: user.username,
+                avatar: user.avatar
+            };
 
             res.json({ success: true, message: 'Usuario logueado exitosamente', user: user });
 
@@ -71,13 +82,14 @@ router.post('/login', async (req, res) => {
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'public/images/uploads/');
+      cb(null, 'public/images/uploads');
     },
     filename: (req, file, cb) => {
-        const uniqueName = Date.now() + '-' + file.originalname;
-        cb(null, uniqueName);
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, uniqueSuffix + path.extname(file.originalname)); // nombre único por archivo, para no duplicados
     }
-});
+  });
+  
 const upload = multer({ storage });
 
 router.post('/update', upload.single('avatar'), async (req, res) => {
@@ -126,14 +138,20 @@ router.post('/postReview', async (req, res) => {
 
     }
 
-    res.json({ success: true});
+    res.json({ success: true });
 
 
 })
 
 router.get('/logout', async (req, res) => {
 
-    res.render('index.ejs');
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error al cerrar sesión:', err);
+            return res.status(500).send('Error al cerrar sesión');
+        }
+        res.redirect('/'); 
+    });
 
 });
 

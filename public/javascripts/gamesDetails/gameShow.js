@@ -1,9 +1,20 @@
 
 import { updateUser } from "../indexFunctions/register-login/auth.js";
+
+AOS.init({
+    duration: 1200,
+
+});
+
+//datos a usar
 const myAccount = document.getElementById('myAccount');
+
+const logOut = document.getElementById('logout');
+
 const game = window.gameData;
 console.log(game); // objeto completo
-const user = JSON.parse(localStorage.getItem('user'));
+
+console.log(user);
 
 
 const buttonSearchGame = document.getElementById('searchGame');
@@ -173,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 })
-
+//Toda la información de los juegos
 function showInformation() {
 
     const release = document.getElementById('releaseDate');
@@ -269,6 +280,7 @@ function showInformation() {
 
 }
 
+//Enseñamos la función para enviar tu review
 
 function showReviews() {
 
@@ -295,10 +307,12 @@ function showReviews() {
 
     const sendReview = document.getElementById("sendReview");
 
+    sendReview.style.cursor="pointer";
+
 
     sendReview.addEventListener('click', () => {
         const rating = document.querySelector('input[name="rating"]:checked')?.value;
-        alert(rating);
+        
 
         const dataBod = {
 
@@ -355,7 +369,7 @@ function showReviews() {
 
 
 }
-
+//Enseñamos las reviews
 function showReviewsComplete() {
 
     const reviewData = document.getElementById('show-reviews');
@@ -399,6 +413,7 @@ function showReviewsComplete() {
                 result.forEach(review => {
 
                     const reviewContainer = document.createElement('div');
+                    reviewContainer.setAttribute('data-aos', 'fade-right')
                     reviewContainer.style.display = "flex";
                     reviewContainer.style.alignItems = "flex-start";
                     reviewContainer.style.backgroundColor = "#1c1c1c";
@@ -427,13 +442,13 @@ function showReviewsComplete() {
 
                     const username = document.createElement('strong');
                     username.textContent = review.username || "Anonymous";
-                    username.style.color = "#00ffff";
+                    username.style.color = generatePastelColor();
                     username.style.fontSize = "1.2em";
                     username.style.fontFamily = "play";
 
                     const rating = document.createElement('span');
                     rating.textContent = `Rating: ${review.rating}/5`;
-                    rating.style.color = "#ffd700";
+                    rating.style.color = "#ffd900";
                     rating.style.fontFamily = "play";
                     rating.style.marginTop = "4px";
 
@@ -466,6 +481,13 @@ function showReviewsComplete() {
 
 
 
+}
+
+function generatePastelColor() {
+    const hue = Math.floor(Math.random() * 360); 
+    const saturation = Math.floor(Math.random() * 30) + 70; 
+    const lightness = Math.floor(Math.random() * 20) + 70; 
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
 myAccount.addEventListener('click', () => {
@@ -608,4 +630,19 @@ myAccount.addEventListener('click', () => {
     modal.appendChild(content);
 
     document.body.appendChild(modal);
+})
+
+logOut.addEventListener('click', () => {
+
+    fetch('users/logout')
+        .then(() => {
+            // Redirige al inicio o login después de cerrar sesión
+            window.location.href = '/';
+        })
+        .catch((err) => {
+            console.error('Error al cerrar sesión', err);
+        });
+
+
+
 })

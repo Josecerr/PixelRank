@@ -6,7 +6,9 @@ import { updateUser } from "../indexFunctions/register-login/auth.js";
 //Sección para coger datos generales
 
 const myAccount = document.getElementById('myAccount');
-const user = JSON.parse(localStorage.getItem('user'));
+
+
+const logOut = document.getElementById('logout');
 
 const buttonSearchGame = document.getElementById('searchGame');
 
@@ -46,7 +48,7 @@ buttonSearchGame.addEventListener('click', (e) => {
 
         .then(result => {
             const divContent = document.getElementById('welcome-Games-content');
-            divContent.textContent="";
+            divContent.textContent = "";
             result.forEach(game => {
 
                 const div = document.createElement('div');
@@ -132,6 +134,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 function getGames() {
+    const divContent = document.getElementById('welcome-Games-content');
+
+    const loaderWrapper = document.createElement('div');
+    loaderWrapper.style.gridColumn = '1 / -1'; // Ocupar todas las columnas
+    loaderWrapper.style.display = 'flex';
+    loaderWrapper.style.justifyContent = 'center';
+
+    loaderWrapper.style.height = '100%';
+
+
+    const loader = document.createElement('div');
+    loader.id = 'games-loader';
+    loader.style.border = '6px solid #f3f3f3';
+    loader.style.borderTop = '6px solid #3498db';
+    loader.style.borderRadius = '50%';
+    loader.style.width = '40px';
+    loader.style.height = '40px';
+    loader.style.animation = 'spin 1s linear infinite';
+    loader.style.margin = '50px auto';
+    loader.style.display = 'block';
+    divContent.innerHTML = '';
+    loaderWrapper.appendChild(loader)
+    divContent.appendChild(loaderWrapper);
+
 
     fetch('getGames/mostrarAll')
         .then(response => {
@@ -146,7 +172,11 @@ function getGames() {
 
         })
         .then(data => {
-            const divContent = document.getElementById('welcome-Games-content');
+
+            divContent.innerHTML = '';
+
+
+
             data.forEach(game => {
 
                 const div = document.createElement('div');
@@ -262,6 +292,7 @@ myAccount.addEventListener('click', () => {
     form.style.width = '100%';
 
     const img = document.createElement('img');
+    img.id="avatarUser";
     img.src = user.avatar;
     img.style.width = '20%';
     img.style.height = '20%'
@@ -315,6 +346,7 @@ myAccount.addEventListener('click', () => {
 
     submitBtn.addEventListener('click', (e) => {
 
+        e.preventDefault();
 
         updateUser(user.id, avatarInput);
 
@@ -355,4 +387,19 @@ myAccount.addEventListener('click', () => {
     modal.appendChild(content);
 
     document.body.appendChild(modal);
+})
+
+logOut.addEventListener('click', () => {
+
+    fetch('users/logout')
+        .then(() => {
+            // Redirige al inicio o login después de cerrar sesión
+            window.location.href = '/';
+        })
+        .catch((err) => {
+            console.error('Error al cerrar sesión', err);
+        });
+
+
+
 })

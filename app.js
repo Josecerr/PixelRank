@@ -45,8 +45,11 @@ var obtenerUsuarios = require('./routes/users');
 var mostrarDashboard=require('./routes/dashboard');
 var showGame=require('./routes/gameShow');
 
-
-
+//Middleware que me permitirá usar user en cualquier ejs.
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null;
+  next();
+});
 
 //Middlewares
 app.use('/', indexRouter);

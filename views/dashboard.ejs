@@ -12,15 +12,17 @@
 
 <body>
 
-    
+
     <%- include('headerDashboard') %>
 
 
 
-    <%- include('bodyDash') %>
-       
+        <%- include('bodyDash') %>
 
-
+        <script> 
+            const user = <%- JSON.stringify(user) %>;
+        </script>
+        
 
 </body>
 
