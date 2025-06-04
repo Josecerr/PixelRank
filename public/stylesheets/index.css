@@ -253,25 +253,22 @@ body {
 }
 
 #divVideoGamesCards #cardVideogames {
-  display: flex;
-  flex-direction: column;
-  width: 50%;
-  height: 230px;
-  border: #111 solid;
-  border-radius: 50px;
+  width: 60%;
+  height: 100%;
+  border-radius: 20px;
+  background-color: rgb(32, 32, 32);
+  margin-bottom: 25px;
   align-items: center;
   justify-content: center;
   justify-items: center;
-  background-color: rgba(0, 0, 0, 0.7);
 
 }
 
 #divVideoGamesCards #cardVideogames img {
 
+  border-radius: 20px;
+  height: 170px;
   width: 100%;
-  height: 80%;
-  object-fit:cover;
-  border-radius: 50px 50px 0 0;
   
   
 

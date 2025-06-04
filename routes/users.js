@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
         const user = await connBBDD.getUserById(userId);
         //Datos sencillos, no peligrosos
         req.session.user = {
-            id: user.id,
+            id: userId,
             email: user.email,
             username: user.username,
             avatar: user.avatar
@@ -82,14 +82,14 @@ router.post('/login', async (req, res) => {
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, 'public/images/uploads');
+        cb(null, 'public/images/uploads');
     },
     filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, uniqueSuffix + path.extname(file.originalname)); // nombre único por archivo, para no duplicados
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname)); // nombre único por archivo, para no duplicados
     }
-  });
-  
+});
+
 const upload = multer({ storage });
 
 router.post('/update', upload.single('avatar'), async (req, res) => {
@@ -111,6 +111,7 @@ router.post('/update', upload.single('avatar'), async (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
         }
+        req.session.user.avatar = avatarUrl;
 
         res.json({ success: true, message: 'Avatar actualizado', avatar: avatarUrl });
 
@@ -150,8 +151,88 @@ router.get('/logout', async (req, res) => {
             console.error('Error al cerrar sesión:', err);
             return res.status(500).send('Error al cerrar sesión');
         }
-        res.redirect('/'); 
+        res.redirect('/');
     });
+
+});
+
+router.get('/search', async (req, res) => {
+    const { username } = req.query;
+
+    if (!username || username.length < 2) {
+        return res.status(400).json({ message: 'Username too short or missing' });
+    }
+
+    try {
+
+        const miId = req.session.user.id;
+
+        const users = await connBBDD.searchFriends(username, miId);
+        res.json(users);
+    } catch (error) {
+        console.error('Error searching users:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+router.post('/sendFriendship', async (req, res) => {
+    const { userFriendID } = req.body;
+
+    const myID = req.session.user.id;
+    try {
+
+        const result = await connBBDD.addFriendship(userFriendID, myID);
+
+        res.json({ success: true, result });
+
+    } catch (error) {
+
+        console.error('Error adding friend:', error);
+        res.status(500).json({ message: 'Server error' });
+
+    }
+
+
+})
+
+router.get('/getFriends', async (req, res) => {
+
+    const myID = req.session.user.id;
+
+    try{
+
+        const result=await connBBDD.getFriends(myID);
+
+        res.json(result);
+
+
+    }catch(error){
+
+        console.error('Error getting friends:', error);
+        res.status(500).json({ message: 'Server error' });
+
+    }
+
+})
+
+router.post('/acceptFriendship',async (req,res)=>{
+
+    const {IDFriendship}=req.body;
+
+    try{
+
+        const result=await connBBDD.acceptFriend(IDFriendship)
+
+        
+
+    }catch(error){
+
+        console.error('Error getting friends:', error);
+        res.status(500).json({ message: 'Server error' });
+        res.render(error);
+
+    }
+
 
 });
 

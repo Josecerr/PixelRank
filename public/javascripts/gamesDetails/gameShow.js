@@ -161,6 +161,11 @@ document.addEventListener('DOMContentLoaded', () => {
     released.textContent = `Released at: ${game.released}`
     released.style.color = "white";
     released.style.fontFamily = "play";
+    released.style.fontSize = '3vh';
+    released.style.fontWeight = '500';
+    released.style.marginTop = '10px';
+    
+    
 
     document.getElementById('game-cover').src = game.background_image;
 
@@ -187,8 +192,45 @@ document.addEventListener('DOMContentLoaded', () => {
 //Toda la información de los juegos
 function showInformation() {
 
-    const release = document.getElementById('releaseDate');
-    release.textContent = game.released;
+    const platformLogos = {
+        pc: 'https://img.icons8.com/color/48/windows-10.png',
+        playstation: 'https://img.icons8.com/color/48/play-station.png',
+        xbox: 'https://img.icons8.com/fluency/48/xbox.png',
+        android: 'https://img.icons8.com/color/48/android-os.png',
+        mac: 'https://img.icons8.com/color/48/mac-logo.png',
+        nintendo: 'https://img.icons8.com/color/48/nintendo-switch-handheld.png'
+    };
+
+    const divData = document.getElementById('dataGame');
+    divData.style.display = "flex";
+    divData.style.gap="20px";
+    const platformIconsDiv = document.getElementById('platformIcons');
+    platformIconsDiv.style.display = 'flex';
+    platformIconsDiv.style.flexDirection = 'row';
+    platformIconsDiv.style.alignItems = 'center';
+
+
+
+
+
+    if (game.parent_platforms) {
+        game.parent_platforms.forEach(p => {
+            const slug = p.platform.slug;
+            const logoUrl = platformLogos[slug]; // platformLogos debe ser un objeto como {'pc': 'url', 'playstation': 'url', ...}
+
+            if (logoUrl) {
+                const img = document.createElement('img');
+                img.src = logoUrl;
+                img.alt = p.platform.name;
+                img.style.width = '30px';
+                img.style.height = '30px';
+                img.style.objectFit = 'contain';
+                img.style.marginRight = '5px';
+                platformIconsDiv.appendChild(img);
+            }
+        });
+    }
+
 
     const h1Name = document.getElementById('gameName');
     h1Name.textContent = game.name;
@@ -307,12 +349,12 @@ function showReviews() {
 
     const sendReview = document.getElementById("sendReview");
 
-    sendReview.style.cursor="pointer";
+    sendReview.style.cursor = "pointer";
 
 
     sendReview.addEventListener('click', () => {
         const rating = document.querySelector('input[name="rating"]:checked')?.value;
-        
+
 
         const dataBod = {
 
@@ -433,7 +475,6 @@ function showReviewsComplete() {
                     avatar.style.objectFit = "cover";
                     reviewContainer.appendChild(avatar);
 
-                    // Text content
                     const content = document.createElement('div');
                     content.style.display = "flex";
                     content.style.flexDirection = "column";
@@ -468,8 +509,6 @@ function showReviewsComplete() {
 
 
 
-
-
                 })
 
 
@@ -484,9 +523,9 @@ function showReviewsComplete() {
 }
 
 function generatePastelColor() {
-    const hue = Math.floor(Math.random() * 360); 
-    const saturation = Math.floor(Math.random() * 30) + 70; 
-    const lightness = Math.floor(Math.random() * 20) + 70; 
+    const hue = Math.floor(Math.random() * 360);
+    const saturation = Math.floor(Math.random() * 30) + 70;
+    const lightness = Math.floor(Math.random() * 20) + 70;
     return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
@@ -630,6 +669,21 @@ myAccount.addEventListener('click', () => {
     modal.appendChild(content);
 
     document.body.appendChild(modal);
+})
+
+logOut.addEventListener('click', () => {
+
+    fetch('users/logout')
+        .then(() => {
+            // Redirige al inicio o login después de cerrar sesión
+            window.location.href = '/';
+        })
+        .catch((err) => {
+            console.error('Error al cerrar sesión', err);
+        });
+
+
+
 })
 
 logOut.addEventListener('click', () => {

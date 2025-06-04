@@ -202,4 +202,87 @@ const getReviews = (gameId) => {
 
 }
 
-module.exports = { connection, insertUser, loginUser, getUserById, updateUser, postReview, getReviews }
+const searchFriends = (username, myId) => {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT id, username, email, avatar FROM users WHERE username LIKE ? AND id != ?";
+    const queryValue = `%${username}%`;
+
+    connection.query(sql, [queryValue, myId], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+const addFriendship = (userFriendId, myID) => {
+
+  return new Promise((resolve, reject) => {
+
+    const estado = "pendiente";
+
+
+    const sql = " INSERT INTO AMISTADES (USUARIO_ID,AMIGO_ID,ESTADO) VALUES(?,?,?)"
+    connection.query(sql, [myID, userFriendId, estado], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+
+
+    })
+
+  })
+
+}
+
+const getFriends = (myID) => {
+
+  return new Promise((resolve, reject) => {
+
+    const sql = `
+  SELECT 
+    u.id,
+    u.username,
+    u.email,
+    u.avatar,
+    a.estado,
+    a.id AS IDFriendship
+  FROM amistades a
+  JOIN users u 
+    ON (a.usuario_id = ? AND u.id = a.amigo_id)
+    OR (a.amigo_id = ? AND u.id = a.usuario_id)
+`;
+
+    connection.query(sql, [myID,myID], (err, result) => {
+
+      if (err) return reject(err);
+      resolve(result);
+
+
+
+    })
+
+  })
+
+
+}
+
+const acceptFriend = (IDFriendship) => {
+
+  return new Promise((resolve, reject) => {
+
+    const sql = "UPDATE amistades SET estado = 'aceptado' WHERE id = ?";
+
+    connection.query(sql, [IDFriendship], (err, result) => {
+
+      if (err) return reject(err);
+
+      resolve(result);
+    });
+
+
+  })
+
+
+
+}
+
+module.exports = { connection, insertUser, loginUser, getUserById, updateUser, postReview, getReviews, searchFriends, addFriendship, getFriends ,acceptFriend}

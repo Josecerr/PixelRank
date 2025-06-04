@@ -13,6 +13,8 @@ router.get('/mostrar', async (req, res) => {
 });
 
 router.get('/mostrarAll', async (req, res) => {
+ 
+
   try {
     const juegos = await rawgApi.obtenerAllGames();
     res.json(juegos);

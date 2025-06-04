@@ -243,7 +243,6 @@ body {
     font-family: "play";
     margin-bottom: 1rem;
 }
-
 #captures-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(32%, 1fr));
@@ -252,6 +251,7 @@ body {
 
 #captures-container img {
     width: 100%;
+    height: 200px; /* Establece una altura fija */
     border-radius: 8px;
     object-fit: cover;
 }
@@ -277,8 +277,8 @@ body {
 }
 
 #review-data {
-    justify-content: center;
-    align-items: center;
+    
+  
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -315,15 +315,14 @@ body {
     unicode-bidi: bidi-override;
     direction:rtl;
     display: block;
-    margin: 0 auto;
+   
     /* centra horizontalmente */
     width: fit-content;
 }
 
 #send-review {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    
     width: 100%;
     height: 5vh;
 }

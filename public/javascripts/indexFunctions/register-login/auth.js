@@ -123,6 +123,7 @@ export function updateUser(userId, avatarInput) {
 
             document.body.removeChild(modal);
 
+            window.location.reload();
 
         })
         .catch(error => {
