@@ -13,19 +13,20 @@
 <body>
 
 
-    <%- include('headerDashboard') %>
+    <%- include('headerLibrary') %>
+
+   
 
 
 
-        <%- include('bodyDash') %>
 
-            <script type="module">
-                //Si es modular del todo, se cargará todas las funciones y no queremos eso
-                const user = <%- JSON.stringify(user) %>;
-                import { initDashboard } from '/javascripts/dashboard/dashboard.js';
-                initDashboard(user);
-            </script>
 
+
+
+    <script>
+         const user = <%- JSON.stringify(user) %>;
+    </script>
+    <script type="module" src="/javascripts/library/library.js" ></script>
 
 </body>
 

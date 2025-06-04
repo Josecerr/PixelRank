@@ -199,14 +199,14 @@ router.get('/getFriends', async (req, res) => {
 
     const myID = req.session.user.id;
 
-    try{
+    try {
 
-        const result=await connBBDD.getFriends(myID);
+        const result = await connBBDD.getFriends(myID);
 
         res.json(result);
 
 
-    }catch(error){
+    } catch (error) {
 
         console.error('Error getting friends:', error);
         res.status(500).json({ message: 'Server error' });
@@ -215,17 +215,18 @@ router.get('/getFriends', async (req, res) => {
 
 })
 
-router.post('/acceptFriendship',async (req,res)=>{
+router.post('/acceptFriendship', async (req, res) => {
 
-    const {IDFriendship}=req.body;
+    const { IDFriendship } = req.body;
 
-    try{
+    try {
 
-        const result=await connBBDD.acceptFriend(IDFriendship)
+        const result = await connBBDD.acceptFriend(IDFriendship)
 
-        
+        res.json(result);
 
-    }catch(error){
+
+    } catch (error) {
 
         console.error('Error getting friends:', error);
         res.status(500).json({ message: 'Server error' });
@@ -235,6 +236,54 @@ router.post('/acceptFriendship',async (req,res)=>{
 
 
 });
+
+router.post('/addToLibrary', async (req, res) => {
+    try {
+        const { gameID, status } = req.body;
+        const userID = req.session.user.id;
+
+        const result = await connBBDD.addToLibrary(userID, gameID, status);
+
+        res.json({
+            success: true,
+            message: 'Game added to library successfully',
+            data: result
+        });
+
+    } catch (error) {
+        res.status(500).render('error', { message: 'Error interno del servidor' });
+
+    }
+});
+
+router.post('/verifyLibrary', async (req, res) => {
+
+    try {
+        const { gameID } = req.body;
+        const userID = req.session.user.id;
+
+        const data = await connBBDD.verifyGameLibrary(userID, gameID);
+
+        const exist = data.length > 0;
+
+        res.json({
+            success: true,
+            message: 'Game exists',
+            data: exist
+        });
+
+
+    } catch (error) {
+
+
+
+    }
+
+
+
+})
+
+
 
 
 

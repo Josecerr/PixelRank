@@ -1,5 +1,9 @@
 
-import { updateUser } from "../indexFunctions/register-login/auth.js";
+import { showMyAccount } from "../dashboard/dashboard.js";
+import { logOutUser } from "../dashboard/dashboard.js";
+import { searchFriendsByUsername } from "../dashboard/dashboard.js";
+import { showFriend } from "../dashboard/dashboard.js";
+
 
 AOS.init({
     duration: 1200,
@@ -8,13 +12,16 @@ AOS.init({
 
 //datos a usar
 const myAccount = document.getElementById('myAccount');
-
 const logOut = document.getElementById('logout');
+const addFriends = document.getElementById('addFriends');
+const myFriends = document.getElementById('myFriends');
+const myLibrary=document.getElementById('myLibrary');
+
 
 const game = window.gameData;
 console.log(game); // objeto completo
 
-console.log(user);
+
 
 
 const buttonSearchGame = document.getElementById('searchGame');
@@ -23,8 +30,8 @@ const goBack = document.getElementById('goBack');
 
 goBack.addEventListener('mouseover', () => {
 
-    goBack.style.animation = 'none'; // quitar animación
-    goBack.offsetHeight; // forzar reflujo (reinicio del estilo)
+    goBack.style.animation = 'none';
+    goBack.offsetHeight;
     goBack.style.animation = 'showUp 0.4s ease-out'; // volver a aplicarla
 
 })
@@ -42,7 +49,10 @@ goBack.addEventListener('click', () => {
 })
 
 
-buttonSearchGame.addEventListener('click', () => {
+
+buttonSearchGame.addEventListener('click', (e) => {
+
+
 
     e.preventDefault();
 
@@ -50,103 +60,18 @@ buttonSearchGame.addEventListener('click', () => {
 
     const value = inputSearch.value;
 
-    const dataBod = {
+    if (value) {
 
-        nombreJuego: value
+        window.location.href = `/dashboard?search=${encodeURIComponent(value)}`;
+    } else {
+
+        window.location.href = `/dashboard`;
 
     }
-    const requestOptions = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(dataBod)
-    };
-
-    fetch('getGames/busquedaJuego', requestOptions)
-        .then(response => {
-
-            if (!response.ok) {
-
-                throw new Error("Error en la solicitud");
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(result => {
-            const divContent = document.getElementById('welcome-Games-content');
-            divContent.textContent = "";
-            result.forEach(game => {
-
-                const div = document.createElement('div');
-                div.id = 'cardVideogames';
-
-                const img = document.createElement('img');
-                img.id = 'images';
-                img.src = game.background_image;
-
-                const h2 = document.createElement('h2');
-                h2.textContent = game.name;
-                h2.id = 'cardVideogames-Title';
-
-                const divDetails = document.createElement('div');
-                divDetails.style.alignItems = "left";
-                divDetails.style.width = "100%";
-                divDetails.style.alignContent = "center";
-                divDetails.style.alignItems = "center";
-                divDetails.style.justifyContent = "center";
-                divDetails.style.justifyItems = "center";
-
-
-
-                const p = document.createElement('p');
-                p.textContent = "ESRB Rating" + " " + game.esrb_rating;
-                p.style.fontFamily = "play";
-                p.style.color = "white";
-                p.style.fontSize = "70%";
-
-
-
-                div.appendChild(img);
-                div.appendChild(h2);
-
-                divDetails.appendChild(p);
-                div.appendChild(divDetails);
-
-
-                divContent.appendChild(div);
-
-                div.addEventListener('mouseover', () => {
-                    div.style.cursor = 'pointer';
-
-                });
-
-                div.addEventListener('mouseout', () => {
-                    div.style.cursor = 'default';
-                });
-
-                div.addEventListener('click', () => {
-
-
-                    window.location.href = `/showGame?id=${game.id}`;
-
-
-
-
-                })
-
-            });
-
-
-        })
-
-
-
 
 });
+
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -164,13 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
     released.style.fontSize = '3vh';
     released.style.fontWeight = '500';
     released.style.marginTop = '10px';
-    
-    
+
+
 
     document.getElementById('game-cover').src = game.background_image;
 
     let cleanDescription = game.description_raw;
-    //Limpiamos la sección Español--> Se podría hacer despues en ingles
+    //Limpiamos la sección Español
     const index = cleanDescription.indexOf('Español');
     if (index !== -1) {
         cleanDescription = cleanDescription.substring(0, index).trim();
@@ -181,14 +106,22 @@ document.addEventListener('DOMContentLoaded', () => {
     //debugging
     console.log(game.description);
 
+
+
+
+
     showReviewsComplete();
+
 
 
     showReviews();
 
+    verifyGameLibrary();
 
 
 })
+
+let alreadyLibrary = false;
 //Toda la información de los juegos
 function showInformation() {
 
@@ -203,7 +136,7 @@ function showInformation() {
 
     const divData = document.getElementById('dataGame');
     divData.style.display = "flex";
-    divData.style.gap="20px";
+    divData.style.gap = "20px";
     const platformIconsDiv = document.getElementById('platformIcons');
     platformIconsDiv.style.display = 'flex';
     platformIconsDiv.style.flexDirection = 'row';
@@ -216,7 +149,7 @@ function showInformation() {
     if (game.parent_platforms) {
         game.parent_platforms.forEach(p => {
             const slug = p.platform.slug;
-            const logoUrl = platformLogos[slug]; // platformLogos debe ser un objeto como {'pc': 'url', 'playstation': 'url', ...}
+            const logoUrl = platformLogos[slug];
 
             if (logoUrl) {
                 const img = document.createElement('img');
@@ -329,22 +262,81 @@ function showReviews() {
 
     const reviewGame = document.getElementById('review-data');
 
-
-
-
     const textArea = document.createElement('textarea');
     textArea.placeholder = "Write your review here";
     textArea.style.backgroundColor = "white";
 
+    const addToLibraryContainer = document.createElement('div');
+    addToLibraryContainer.style.display = 'flex';
+    addToLibraryContainer.style.alignItems = 'center';
+    addToLibraryContainer.style.backgroundColor = '#ffffff';
+    addToLibraryContainer.style.borderRadius = '12px';
+    addToLibraryContainer.style.padding = '10px 14px';
+    addToLibraryContainer.style.fontFamily = 'Arial, sans-serif';
+    addToLibraryContainer.style.width = 'fit-content';
+    addToLibraryContainer.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+    addToLibraryContainer.style.cursor = 'pointer';
+    addToLibraryContainer.style.transition = 'transform 0.2s ease';
+    addToLibraryContainer.style.gap = '10px';
+    addToLibraryContainer.style.border = '1px solid #ddd';
+    addToLibraryContainer.id = "libraryContainer";
+
+    // Efecto hover (opcional)
+    addToLibraryContainer.addEventListener('mouseenter', () => {
+        addToLibraryContainer.style.transform = 'scale(1.02)';
+    });
+    addToLibraryContainer.addEventListener('mouseleave', () => {
+        addToLibraryContainer.style.transform = 'scale(1)';
+    });
+
+    // Texto
+    const textInfo=document.createElement('p');
+
+    textInfo.innerHTML = `
+  <span id="addToText" style="font-size: 0.75rem; color: #888;">Add to</span><br>
+  <strong id="libraryLabel" style="font-size: 1rem; color: #222;">My games</strong>
+`;
+    textInfo.style.lineHeight = '1.2';
+
+    // Botón redondo con "+"
+    const addButton = document.createElement('div');
+    addButton.textContent = '+';
+    addButton.style.background = 'linear-gradient(145deg, #a2db34, #70bf00)';
+    addButton.style.color = '#fff';
+    addButton.style.fontSize = '1.2rem';
+    addButton.style.width = '32px';
+    addButton.style.height = '32px';
+    addButton.style.display = 'flex';
+    addButton.style.alignItems = 'center';
+    addButton.style.justifyContent = 'center';
+    addButton.style.borderRadius = '50%';
+    addButton.style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
+    addButton.style.flexShrink = '0';
+    addButton.style.transition = 'background 0.3s ease';
+    addButton.id = "addToLibraryGame";
+
+    addButton.addEventListener('mouseenter', () => {
+        addButton.style.background = 'linear-gradient(145deg, #b6f542, #7fd000)';
+    });
+    addButton.addEventListener('mouseleave', () => {
+        addButton.style.background = 'linear-gradient(145deg, #a2db34, #70bf00)';
+    });
+
+    addToLibraryContainer.addEventListener('click', () => {
+
+        if (alreadyLibrary) return;
+
+        addToMyLibrary(addButton);
+
+    });
 
 
-
-
-
-
+    addToLibraryContainer.appendChild(textInfo);
+    addToLibraryContainer.appendChild(addButton);
 
 
     reviewGame.appendChild(textArea);
+    reviewGame.appendChild(addToLibraryContainer);
 
 
     const sendReview = document.getElementById("sendReview");
@@ -522,6 +514,109 @@ function showReviewsComplete() {
 
 }
 
+function verifyGameLibrary() {
+    const addButton = document.getElementById('addToLibraryGame');
+
+    const dataBod = {
+
+        gameID: game.id
+
+
+    }
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataBod)
+    };
+
+    fetch('users/verifyLibrary', requestOptions)
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error("Error verifying the library");
+
+            }
+            return response.json();
+
+        })
+
+        .then(result => {
+
+            if (result.success) {
+                if (result.data) {
+
+                    addButton.textContent = "✓";
+                    addButton.style.pointerEvents = 'none';
+                    addButton.style.cursor = 'default';
+                    alreadyLibrary = true;
+                    document.getElementById('addToText').textContent = 'Library';
+                    document.getElementById('libraryLabel').textContent = 'Already added';
+
+
+                }
+
+            } else {
+
+                addToMyLibrary(buttonAdd);
+
+            }
+
+
+        })
+
+}
+
+function addToMyLibrary(buttonAdd) {
+    const status = "Pending";
+
+    const dataBod = {
+
+        gameID: game.id,
+        status: status
+    }
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataBod)
+    };
+
+    fetch('users/addToLibrary', requestOptions)
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error("Error adding to my library");
+
+            }
+            return response.json();
+
+        })
+
+        .then(result => {
+
+            if (result.success) {
+
+                buttonAdd.textContent = "✓"
+                verifyGameLibrary();
+            }
+
+
+
+
+        }).catch(error => {
+
+            console.error('Fetch error:', error);
+
+        });
+
+
+}
+
 function generatePastelColor() {
     const hue = Math.floor(Math.random() * 360);
     const saturation = Math.floor(Math.random() * 30) + 70;
@@ -531,172 +626,33 @@ function generatePastelColor() {
 
 myAccount.addEventListener('click', () => {
 
-
-    const modal = document.createElement('div');
-    modal.id = "modal-edit-account";
-    modal.style.position = 'fixed';
-    modal.style.top = 0;
-    modal.style.left = 0;
-    modal.style.width = '100%';
-    modal.style.height = '100vh';
-    modal.style.display = 'flex';
-    modal.style.flexDirection = 'column';
-    modal.style.alignItems = 'center';
-    modal.style.justifyContent = 'center';
-    modal.style.backgroundColor = 'rgba(0,0,0,0.6)';
-    modal.style.zIndex = '1000';
-
-    const title = document.createElement('h1');
-    title.textContent = "My Account";
-    title.style.fontFamily = "'Pixelify Sans', sans-serif";
-    title.style.color = 'white';
-    title.style.marginBottom = '20px';
-    title.style.textShadow = '1px 1px 4px black';
-    title.style.fontSize = '4vh';
-
-    const content = document.createElement('div');
-    content.style.background = '#fff';
-    content.style.padding = '30px';
-    content.style.borderRadius = '20px';
-    content.style.boxShadow = '0 5px 20px rgba(0,0,0,0.4)';
-    content.style.width = '400px';
-    content.style.display = 'flex';
-    content.style.flexDirection = 'column';
-    content.style.alignItems = 'center';
-    content.style.gap = '15px';
-    content.style.fontFamily = "'Play', sans-serif";
-    content.style.position = 'relative';
-
-
-    const form = document.createElement('form');
-    form.style.display = 'flex';
-    form.style.flexDirection = 'column';
-    form.style.gap = '12px';
-    form.style.width = '100%';
-
-    const img = document.createElement('img');
-    img.src = user.avatar;
-    img.style.width = '20%';
-    img.style.height = '20%'
-
-    const avatarLabel = document.createElement('label');
-    avatarLabel.textContent = "Profile Picture:";
-    const avatarInput = document.createElement('input');
-    avatarInput.type = "file";
-    avatarInput.name = "avatar";
-    avatarInput.accept = "image/*";
-    avatarInput.style.padding = '5px';
-
-    // Username
-    const usernameLabel = document.createElement('label');
-    usernameLabel.textContent = "Username:";
-    const usernameInput = document.createElement('input');
-    usernameInput.type = "text";
-    usernameInput.name = "username";
-    usernameInput.required = true;
-    usernameInput.value = user.username || "";
-    usernameInput.style.padding = '10px';
-    usernameInput.style.borderRadius = '8px';
-    usernameInput.disabled = true
-    usernameInput.textContent = user.username;
-
-
-
-    // Error Message
-    const errorMessage = document.createElement('div');
-    errorMessage.style.color = 'red';
-    errorMessage.style.fontSize = '14px';
-
-    // Submit
-    const submitBtn = document.createElement('button');
-    submitBtn.type = 'submit';
-    submitBtn.textContent = "Save Changes";
-    submitBtn.style.padding = '10px';
-    submitBtn.style.backgroundColor = 'black';
-    submitBtn.style.color = 'white';
-    submitBtn.style.border = 'none';
-    submitBtn.style.borderRadius = '8px';
-    submitBtn.style.cursor = 'pointer';
-
-    submitBtn.addEventListener('mouseenter', () => {
-        submitBtn.style.backgroundColor = '#002bff';
-    });
-
-    submitBtn.addEventListener('mouseleave', () => {
-        submitBtn.style.backgroundColor = 'black';
-    });
-
-    submitBtn.addEventListener('click', (e) => {
-
-        e.preventDefault();
-        updateUser(user.id, avatarInput);
-
-        document.body.removeChild(modal);
-        document.body.style.overflow = 'auto';
-
-
-
-    })
-    form.appendChild(img);
-    form.appendChild(avatarInput);
-    form.appendChild(usernameLabel);
-    form.appendChild(usernameInput);
-    form.appendChild(errorMessage);
-    form.appendChild(submitBtn);
-
-
-    // Cerrar
-    const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = '&times;';
-    closeBtn.style.position = 'absolute';
-    closeBtn.style.top = '10px';
-    closeBtn.style.right = '10px';
-    closeBtn.style.background = 'transparent';
-    closeBtn.style.border = 'none';
-    closeBtn.style.fontSize = '28px';
-    closeBtn.style.cursor = 'pointer';
-    closeBtn.style.color = 'red';
-
-    closeBtn.addEventListener('click', () => {
-        document.body.removeChild(modal);
-        document.body.style.overflow = 'auto';
-    });
-
-    content.appendChild(closeBtn);
-    content.appendChild(form);
-
-    modal.appendChild(title);
-    modal.appendChild(content);
-
-    document.body.appendChild(modal);
-})
-
-logOut.addEventListener('click', () => {
-
-    fetch('users/logout')
-        .then(() => {
-            // Redirige al inicio o login después de cerrar sesión
-            window.location.href = '/';
-        })
-        .catch((err) => {
-            console.error('Error al cerrar sesión', err);
-        });
-
+    showMyAccount();
 
 
 })
 
 logOut.addEventListener('click', () => {
 
-    fetch('users/logout')
-        .then(() => {
-            // Redirige al inicio o login después de cerrar sesión
-            window.location.href = '/';
-        })
-        .catch((err) => {
-            console.error('Error al cerrar sesión', err);
-        });
+    logOutUser();
 
+
+
+})
+myFriends.addEventListener('click', () => {
+
+    showFriend();
+
+})
+
+addFriends.addEventListener('click', () => {
+
+
+    searchFriendsByUsername();
+
+})
+myLibrary.addEventListener('click',()=>{
+
+    window.location.href='myLibrary';
 
 
 })

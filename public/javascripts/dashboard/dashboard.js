@@ -9,25 +9,44 @@ const myAccount = document.getElementById('myAccount');
 const addFriends = document.getElementById('addFriends');
 const myFriends = document.getElementById('myFriends');
 const logOut = document.getElementById('logout');
+const myLibrary = document.getElementById('myLibrary');
+
 
 const buttonSearchGame = document.getElementById('searchGame');
 
-let currentPage = 1;
-let isLoading = false;
 
 
+export function initDashboard(user) {
 
-document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
 
-    getGames();
-    const h1Title = document.getElementById('welcome-user');
-    h1Title.textContent = 'WELCOME ' + user.username;
 
-    const imageSrc = document.getElementById('img-data-user');
-    imageSrc.src = user.avatar;
+        const h1Title = document.getElementById('welcome-user');
 
-})
+        if (h1Title) {
+            h1Title.textContent = 'WELCOME ' + user.username;
+        }
 
+
+        const imageSrc = document.getElementById('img-data-user');
+        imageSrc.src = user.avatar;
+
+        const params = new URLSearchParams(window.location.search);
+        const search = params.get('search');
+
+        getGames();
+
+
+        if (search) {
+            const input = document.getElementById('default-search');
+            input.value = search;
+
+            buscarJuego(search);
+        }
+
+
+    })
+}
 
 
 
@@ -36,9 +55,9 @@ function getGames() {
     // Logos
 
 
-    
+
     const platformLogos = {
-        pc: 'https://img.icons8.com/color/48/windows-10.png', 
+        pc: 'https://img.icons8.com/color/48/windows-10.png',
         playstation: 'https://img.icons8.com/color/48/play-station.png',
         xbox: 'https://img.icons8.com/fluency/48/xbox.png',
         android: 'https://img.icons8.com/color/48/android-os.png',
@@ -153,6 +172,25 @@ function getGames() {
 
 
 buttonSearchGame.addEventListener('click', (e) => {
+
+    e.preventDefault();
+    const inputSearch = document.getElementById('default-search');
+
+    const value = inputSearch.value;
+    //Si el valor de busqueda existe, usamos la función, si no, "recargamos" página.
+    if (value) {
+        buscarJuego(value);
+    } else {
+
+        window.location.href = "/dashboard";
+
+    }
+
+})
+
+
+function buscarJuego(value) {
+
     const divContent = document.getElementById('welcome-Games-content');
     const loaderWrapper = document.createElement('div');
     loaderWrapper.style.gridColumn = '1 / -1';
@@ -176,14 +214,11 @@ buttonSearchGame.addEventListener('click', (e) => {
     divContent.appendChild(loaderWrapper);
 
 
-    e.preventDefault();
 
-    const inputSearch = document.getElementById('default-search');
 
-    const value = inputSearch.value;
 
     const platformLogos = {
-        pc: 'https://img.icons8.com/color/48/windows-10.png', 
+        pc: 'https://img.icons8.com/color/48/windows-10.png',
         playstation: 'https://img.icons8.com/color/48/play-station.png',
         xbox: 'https://img.icons8.com/fluency/48/xbox.png',
         android: 'https://img.icons8.com/color/48/android-os.png',
@@ -268,7 +303,7 @@ buttonSearchGame.addEventListener('click', (e) => {
 
 
 
-          
+
 
 
 
@@ -277,7 +312,7 @@ buttonSearchGame.addEventListener('click', (e) => {
 
                 divDetails.appendChild(platformIconsDiv);
 
-   
+
                 div.appendChild(divDetails);
 
 
@@ -307,14 +342,23 @@ buttonSearchGame.addEventListener('click', (e) => {
 
         })
 
-})
 
 
 
-//funciones 
+
+}
+
+
+//funciones página
 
 myAccount.addEventListener('click', () => {
 
+    showMyAccount();
+})
+
+function showMyAccount() {
+
+    if (document.getElementById('modal-edit-account')) return;
 
     const modal = document.createElement('div');
     modal.id = "modal-edit-account";
@@ -451,13 +495,24 @@ myAccount.addEventListener('click', () => {
     modal.appendChild(content);
 
     document.body.appendChild(modal);
-})
+
+
+}
+
+
+
 
 logOut.addEventListener('click', () => {
 
+    logOutUser();
+
+})
+
+function logOutUser() {
+
     fetch('users/logout')
         .then(() => {
-            // Redirige al inicio o login después de cerrar sesión
+
             window.location.href = '/';
         })
         .catch((err) => {
@@ -465,12 +520,21 @@ logOut.addEventListener('click', () => {
         });
 
 
+}
 
-})
+
+
 
 
 
 addFriends.addEventListener('click', () => {
+
+    searchFriendsByUsername();
+
+});
+
+function searchFriendsByUsername() {
+    if (document.getElementById('modal-add-friends')) return;
     const modal = document.createElement('div');
     modal.id = "modal-add-friends";
     modal.style.position = 'fixed';
@@ -632,7 +696,10 @@ addFriends.addEventListener('click', () => {
 
     modal.appendChild(content);
     document.body.appendChild(modal);
-});
+
+
+
+}
 
 function sendFriendship(userFriendID, addBtn) {
 
@@ -683,6 +750,9 @@ myFriends.addEventListener('click', () => {
 })
 
 function showFriend() {
+
+    if (document.getElementById('modal-add-friends')) return;
+
 
     const modal = document.createElement('div');
     modal.id = "modal-add-friends";
@@ -874,8 +944,12 @@ function acceptFriendShip(IDFriendship, estadoBtn) {
 
 
         })
-        .then(data => {
+        .then(result => {
 
+            const existingModal = document.getElementById('modal-add-friends');
+            if (existingModal) {
+                document.body.removeChild(existingModal);
+            }
 
             showFriend();
 
@@ -885,3 +959,10 @@ function acceptFriendShip(IDFriendship, estadoBtn) {
 
 
 }
+if (myLibrary) {
+    myLibrary.addEventListener('click', () => {
+        window.location.href = '/myLibrary';
+    });
+}
+
+export { showMyAccount, showFriend, logOutUser, searchFriendsByUsername }

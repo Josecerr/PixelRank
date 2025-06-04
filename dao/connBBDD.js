@@ -285,4 +285,44 @@ const acceptFriend = (IDFriendship) => {
 
 }
 
-module.exports = { connection, insertUser, loginUser, getUserById, updateUser, postReview, getReviews, searchFriends, addFriendship, getFriends ,acceptFriend}
+const verifyGameLibrary=(userID,gameID)=>{
+
+  return new Promise((resolve,reject)=>{
+
+    const sql=" SELECT * FROM USER_GAMES WHERE USER_ID=? AND GAME_ID=?"
+
+    connection.query(sql,[userID,gameID],(err,result)=>{
+
+      if(err) return reject(err);
+
+      resolve(result);
+
+
+    })
+
+  })
+
+
+}
+
+const addToLibrary=(userID,gameID,status)=>{
+
+  return new Promise((resolve,reject)=>{
+    const sql="INSERT INTO USER_GAMES(USER_ID,GAME_ID,STATUS) VALUES (?,?,?)"
+
+    connection.query(sql,[userID,gameID,status],(err,result)=>{
+
+      if(err) return reject(err);
+
+      resolve(result);
+      
+
+    })
+
+  })
+
+
+}
+
+
+module.exports = { connection, insertUser, loginUser, getUserById, updateUser, postReview, getReviews, searchFriends, addFriendship, getFriends ,acceptFriend, verifyGameLibrary,addToLibrary }
