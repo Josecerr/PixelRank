@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const connBBDD = require('../dao/connBBDD');
 const bcrypt = require('bcrypt');
+const rawgApi = require('../public/services/rawgApi');
 
 const multer = require('multer');
 const path = require('path');
@@ -283,7 +284,45 @@ router.post('/verifyLibrary', async (req, res) => {
 
 })
 
+router.get('/getLibrary', async (req, res) => {
 
+   
+    try {
+
+        const userID = req.session.user.id;
+
+        const result = await connBBDD.getLibrary(userID);
+
+        const id = [];
+
+        for (i = 0; i < result.length; i++) {
+
+            id.push(result[i].game_id);
+
+        }
+
+
+        const juegos = [];
+        for (let i = 0; i < id.length; i++) {
+            const juego = await rawgApi.obtenerJuegoPorId(id[i]);
+            if (juego) juegos.push(juego); 
+        }
+
+        res.json(juegos);
+
+
+    } catch (error) {
+
+        res.status(500).render('error', { message: 'Error interno del servidor' });
+
+
+    }
+
+
+
+
+
+})
 
 
 

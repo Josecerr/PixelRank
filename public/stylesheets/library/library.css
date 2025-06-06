@@ -1,0 +1,235 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Play:wght@400;700&display=swap');
+body {
+
+    margin: 0;
+    background-color: rgb(21, 21, 21);
+}
+
+
+#index-header {
+    
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    background-color: #eee;
+
+}
+
+#index-header #title {
+
+
+    margin-left: 2vh;
+
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    gap: 40px;
+}
+
+
+
+#index-header h1 {
+    font-family: "Pixelify Sans", sans-serif;
+    font-size: 4rem;
+    text-align: center;
+    margin: 0;
+    color: black;
+}
+
+#index-header input {
+
+    width: 500px;
+    border-radius: 500px;
+    border: rgb(26, 24, 24), solid 2px;
+}
+
+#index-header #navegation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 50px;
+
+}
+
+#index-header #navegation button {
+
+    height: 30px;
+    background-color: transparent;
+    color: black;
+    font-size: 25px;
+    border: none;
+    font-family: "play";
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+#index-header #navegation button:hover {
+    color: #002bff;
+    transform: scale(1.1);
+}
+
+#index-header #navegation #discord-button {
+
+    margin-bottom: 8px;
+
+}
+
+#index-header #navegation #discord-button img {
+
+    width: 40px;
+    height: 38px;
+
+}
+#generalContent {
+    width: 100%;
+    display: block;
+  }
+  
+  #games-library {
+    width: 100%;
+   
+    box-sizing: border-box;
+  }
+  
+
+#wcmUser{
+
+    font-size: 5vh;
+
+}
+/* General */
+
+  
+  /* --- CABECERA tipo RAWG --- */
+  /* --- CONTENEDORES PRINCIPALES --- */
+#generalContent {
+    width: 100%;
+    display: block;
+  }
+  
+  /* --- CABECERA CON 4 IMÁGENES --- */
+  .library-header {
+    position: relative;
+    height: 95vh;
+    overflow: hidden;
+    border-radius: 12px;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Cuadrícula de 4 imágenes */
+  .grid-images {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    width: 100%;
+    height: 100%;
+  }
+  
+  .grid-image {
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Capa oscura con texto centrado */
+  .header-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), #111);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+  }
+  
+  .header-content {
+    text-align: center;
+    color: #fff;
+    z-index: 2;
+  }
+  
+  .header-content h1 {
+    font-size: 48px;
+    margin: 10px 0;
+  }
+  
+  .header-content p {
+    font-size: 18px;
+    margin: 0;
+    opacity: 0.8;
+  }
+  
+  .badge {
+    display: inline-block;
+    margin-top: 10px;
+    background: #fff;
+    color: #000;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  /* --- GRID DE JUEGOS DESPUÉS DE LA CABECERA --- */
+  .library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  /* Tarjeta de cada juego */
+  .game-card {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+  }
+  
+  .game-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .game-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+  
+  .game-info {
+    padding: 10px;
+  }
+  
+  .game-info h3 {
+    margin: 0;
+    font-size: 18px;
+    font-family: "play";
+    color: #fff;
+  }
+  
+  .game-info p {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #ccc;
+  }
+  @keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

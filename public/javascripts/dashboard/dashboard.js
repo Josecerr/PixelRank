@@ -4,6 +4,7 @@ import { updateUser } from "../indexFunctions/register-login/auth.js";
 
 
 //Sección para coger datos generales y funciones
+ 
 
 const myAccount = document.getElementById('myAccount');
 const addFriends = document.getElementById('addFriends');
@@ -11,6 +12,7 @@ const myFriends = document.getElementById('myFriends');
 const logOut = document.getElementById('logout');
 const myLibrary = document.getElementById('myLibrary');
 
+const user=document.getElementById('userLogged');
 
 const buttonSearchGame = document.getElementById('searchGame');
 
@@ -44,8 +46,19 @@ export function initDashboard(user) {
             buscarJuego(search);
         }
 
+        myAccount.addEventListener('click', () => {
+
+            console.log(user);
+            showMyAccount(user);
+            
+        
+        })
+        
+
 
     })
+
+
 }
 
 
@@ -351,12 +364,9 @@ function buscarJuego(value) {
 
 //funciones página
 
-myAccount.addEventListener('click', () => {
 
-    showMyAccount();
-})
+function showMyAccount(user) {
 
-function showMyAccount() {
 
     if (document.getElementById('modal-edit-account')) return;
 
@@ -408,6 +418,7 @@ function showMyAccount() {
     img.style.width = '20%';
     img.style.height = '20%'
 
+    
     const avatarLabel = document.createElement('label');
     avatarLabel.textContent = "Profile Picture:";
     const avatarInput = document.createElement('input');

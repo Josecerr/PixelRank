@@ -117,6 +117,34 @@ async function obtenerJuegoPorNombre(nombreJuego) {
   }
 }
 
+async function obtenerJuegoPorID(id) {
+  try {
+    const response = await axios.get(`${BASE_URL}/games/${id}`, {
+      params: {
+        key: RAWG_API_KEY
+      }
+    });
+
+    console.log('Juego obtenido por ID:', response.data);
+    return response.data;
+
+  } catch (error) {
+    if (error.response) {
+      console.error('Error de respuesta RAWG (ID):', {
+        status: error.response.status,
+        data: error.response.data
+      });
+    } else if (error.request) {
+      console.error('Sin respuesta de RAWG (ID):', error.request);
+    } else {
+      console.error('Error al configurar solicitud (ID):', error.message);
+    }
+
+    throw error;
+  }
+}
+
+
 
 module.exports = {
   obtenerJuegos,
@@ -124,5 +152,6 @@ module.exports = {
   obtenerJuegoPorId,
   obtenerScreenshots,
   obtenerTrailers,
-  obtenerJuegoPorNombre
+  obtenerJuegoPorNombre,
+  obtenerJuegoPorId
 };

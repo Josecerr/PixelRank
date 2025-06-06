@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PixelRank</title>
-    <link rel="stylesheet" href="/stylesheets/dashboard/dashboard.css">
+    <link rel="stylesheet" href="/stylesheets/library/library.css">
     <link rel="icon" href="/images/Favicon.png" type="image/png">
 </head>
 
@@ -15,7 +15,13 @@
 
     <%- include('headerLibrary') %>
 
-   
+
+
+        <div id="generalContent">
+
+
+            <div id="games-library"></div>
+        </div>
 
 
 
@@ -23,10 +29,10 @@
 
 
 
-    <script>
-         const user = <%- JSON.stringify(user) %>;
-    </script>
-    <script type="module" src="/javascripts/library/library.js" ></script>
+        <script>
+            const user = <%- JSON.stringify(user) %>;
+        </script>
+        <script type="module" src="/javascripts/library/library.js"></script>
 
 </body>
 
