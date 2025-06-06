@@ -24,6 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 })
 
+pixelRank.addEventListener('mouseover',()=>{
+
+    pixelRank.style.cursor = 'pointer';
+
+
+})
+
 pixelRank.addEventListener('click', () => {
 
     window.location.href = "/dashboard";
@@ -131,20 +138,36 @@ function showLibrary(userFriend) {
                 // Header con fondo de 4 juegos
                 const header = document.createElement('div');
                 header.className = 'library-header';
+
+                let fondoHTML = '';
+
+                if (juegosAleatorios.length === 1) {
+                    // Solo un juego con imagen → usar imagen completa
+                    fondoHTML = `
+    <div class="single-image" style="background-image: url('${juegosAleatorios[0].background_image}')"></div>
+  `;
+                } else {
+                    // Dos o más juegos → usar grid
+                    fondoHTML = `
+    <div class="grid-images">
+      ${juegosAleatorios.map(j => `
+        <div class="grid-image" style="background-image: url('${j.background_image}')"></div>
+      `).join('')}
+    </div>
+  `;
+                }
+
                 header.innerHTML = `
-          <div class="grid-images">
-            ${juegosAleatorios.map(j => `
-              <div class="grid-image" style="background-image: url('${j.background_image}')"></div>
-            `).join('')}
-          </div>
-          <div class="header-overlay">
-            <div class="header-content">
-              <p>${juegos.length} GAMES</p>
-              <h1> Library of ${userFriend.username}</h1>
-            </div>
-          </div>
-        `;
+  ${fondoHTML}
+  <div class="header-overlay">
+    <div class="header-content">
+      <p>${juegos.length} GAMES</p>
+      <h1>LIBRARY OF ${userFriend.username.toUpperCase()}</h1>
+    </div>
+  </div>
+`;
                 container.appendChild(header);
+
 
                 // Grid de los  juegos
                 const juegosContainer = document.createElement('div');
@@ -180,7 +203,7 @@ function showLibrary(userFriend) {
                     })
                     const select = card.querySelector('select');
 
-                  
+
 
 
                     juegosContainer.appendChild(card);
@@ -191,7 +214,7 @@ function showLibrary(userFriend) {
             } else if (juegos.length === 0) {
                 const container = document.getElementById('games-library');
                 container.innerHTML = '';
-            
+
                 const header = document.createElement('div');
                 header.className = 'library-header';
                 header.innerHTML = `

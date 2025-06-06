@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 })
 
-pixelRank.addEventListener('mouseover',()=>{
+pixelRank.addEventListener('mouseover', () => {
 
     pixelRank.style.cursor = 'pointer';
 
@@ -137,20 +137,36 @@ function showLibrary() {
                 // Header con fondo de 4 juegos
                 const header = document.createElement('div');
                 header.className = 'library-header';
-                header.innerHTML = `
-          <div class="grid-images">
-            ${juegosAleatorios.map(j => `
-              <div class="grid-image" style="background-image: url('${j.background_image}')"></div>
-            `).join('')}
-          </div>
-          <div class="header-overlay">
-            <div class="header-content">
-              <p>${juegos.length} GAMES</p>
-              <h1>Your Library ${user.username}</h1>
-            </div>
-          </div>
-        `;
+
+                let fondoHTML = '';
+
+                if (juegosAleatorios.length === 1) {
+                    // Solo un juego con imagen → usar imagen completa
+                    fondoHTML = `
+    <div class="single-image" style="background-image: url('${juegosAleatorios[0].background_image}')"></div>
+  `;
+                } else {
+                    // Dos o más juegos → usar grid
+                    fondoHTML = `
+                    <div class="grid-images">
+                    ${juegosAleatorios.map(j => `
+                        <div class="grid-image" style="background-image: url('${j.background_image}')"></div>
+                    `).join('')}
+                    </div>
+                `;
+                                }
+
+                                header.innerHTML = `
+                ${fondoHTML}
+                <div class="header-overlay">
+                    <div class="header-content">
+                    <p>${juegos.length} GAMES</p>
+                    <h1>YOUR LIBRARY ${user.username}</h1>
+                    </div>
+                </div>
+                `;
                 container.appendChild(header);
+
 
                 // Grid de los  juegos
                 const juegosContainer = document.createElement('div');
@@ -168,9 +184,11 @@ function showLibrary() {
               <p>${juego.genres?.map(g => g.name).join(', ') || ''}</p>
               <label class="status-label">Status from Library</label>
               <select class="select-status" data-gameid="${juego.id}">
-                <option value="playing" ${juego.status === 'pending' ? 'selected' : ''}>Pending</option>
-                <option value="completed" ${juego.status === 'completed' ? 'selected' : ''}>Completed</option>
+                <option value="pending" ${juego.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="playing" ${juego.status === 'playing' ? 'selected' : ''}>Playing</option>
                 <option value="wishlist" ${juego.status === 'wishlist' ? 'selected' : ''}>Wishlist</option>
+                <option value="completed" ${juego.status === 'completed' ? 'selected' : ''}>Completed</option>
+                
         </select>
             </div>
           `;
@@ -203,7 +221,7 @@ function showLibrary() {
             } else if (juegos.length === 0) {
                 const container = document.getElementById('games-library');
                 container.innerHTML = '';
-            
+
                 const header = document.createElement('div');
                 header.className = 'library-header';
                 header.innerHTML = `
@@ -273,7 +291,7 @@ function updateStatusGame(juegoID, status) {
 
 
 
-    } else if (status === "wishlist" || status === "playing") {
+    } else if (status === "wishlist" || status === "playing" || status==="pending") {
 
         const dataBod = {
 

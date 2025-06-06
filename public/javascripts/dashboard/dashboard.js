@@ -11,6 +11,7 @@ const addFriends = document.getElementById('addFriends');
 const myFriends = document.getElementById('myFriends');
 const logOut = document.getElementById('logout');
 const myLibrary = document.getElementById('myLibrary');
+const pixelRank = document.getElementById('titleDashboard');
 
 const user = document.getElementById('userLogged');
 
@@ -61,7 +62,18 @@ export function initDashboard(user) {
 
 }
 
+pixelRank.addEventListener('mouseover', () => {
 
+    pixelRank.style.cursor = 'pointer';
+
+})
+
+pixelRank.addEventListener('click', () => {
+
+    window.location.href = "/dashboard";
+
+
+})
 
 
 function getGames() {
@@ -843,6 +855,12 @@ function showFriend() {
                 amigosAceptados.forEach(user => {
                     const userCard = createUserCardAccepted(user);
 
+                    userCard.addEventListener('mouseover',()=>{
+
+                        userCard.style.cursor = 'pointer';
+
+                    })
+
                     userCard.addEventListener('click', () => {
 
                         showOthersLibrary(user);
@@ -931,8 +949,6 @@ function showFriend() {
 
         return userDiv;
     }
-
-
     function createUserCardAccepted(result) {
         const userDiv = document.createElement('div');
         userDiv.style.display = 'flex';
@@ -941,12 +957,12 @@ function showFriend() {
         userDiv.style.borderBottom = '1px solid #ddd';
         userDiv.style.padding = '5px 0';
         userDiv.style.width = '100%';
-
+    
         const infoContainer = document.createElement('div');
         infoContainer.style.display = 'flex';
         infoContainer.style.alignItems = 'center';
         infoContainer.style.gap = '10px';
-
+    
         const avatarImg = document.createElement('img');
         avatarImg.src = result.avatar;
         avatarImg.alt = `${result.username}'s avatar`;
@@ -954,25 +970,44 @@ function showFriend() {
         avatarImg.style.height = '40px';
         avatarImg.style.borderRadius = '50%';
         avatarImg.style.objectFit = 'cover';
-
+    
         const userInfo = document.createElement('span');
         userInfo.textContent = `${result.username} (${result.email})`;
-
-
+    
         const userInfoContainer = document.createElement('div');
         userInfoContainer.style.display = 'flex';
         userInfoContainer.style.alignItems = 'center';
         userInfoContainer.style.gap = '10px';
-
+    
         userInfoContainer.appendChild(userInfo);
-
-
+    
         infoContainer.appendChild(avatarImg);
         infoContainer.appendChild(userInfoContainer);
         userDiv.appendChild(infoContainer);
+    
+       
+        const chatButton = document.createElement('button');
+        chatButton.textContent = 'Chat';
+        chatButton.style.padding = '6px 12px';
+        chatButton.style.backgroundColor = '#007bff';
+        chatButton.style.color = 'white';
+        chatButton.style.border = 'none';
+        chatButton.style.borderRadius = '6px';
+        chatButton.style.cursor = 'pointer';
+    
+   
+        chatButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+        
+            chatModal(result);
 
+        });
+    
+        userDiv.appendChild(chatButton); 
+    
         return userDiv;
     }
+    
 
 
 
@@ -1037,6 +1072,107 @@ if (myLibrary) {
     myLibrary.addEventListener('click', () => {
         window.location.href = '/myLibrary';
     });
+}
+
+function chatModal(userFriend) {
+    // Elimina el modal anterior si existe
+    const existing = document.getElementById('chatModal');
+    if (existing) existing.remove();
+
+    // Crea el fondo del modal
+    const modal = document.createElement('div');
+    modal.id = 'chatModal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '1000';
+
+    // Contenido del modal
+    const content = document.createElement('div');
+    content.style.backgroundColor = '#1e1e1e';
+    content.style.borderRadius = '12px';
+    content.style.padding = '20px';
+    content.style.width = '400px';
+    content.style.maxHeight = '80vh';
+    content.style.display = 'flex';
+    content.style.flexDirection = 'column';
+    content.style.gap = '10px';
+    content.style.color = 'white';
+
+    
+    const title = document.createElement('h2');
+    title.textContent = `Chat with ${userFriend.username}`;
+    title.style.margin = '0';
+
+
+    const closeBtn = document.createElement('span');
+    closeBtn.textContent = '✖';
+    closeBtn.style.alignSelf = 'flex-end';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.fontSize = '20px';
+    closeBtn.addEventListener('click', () => modal.remove());
+
+  
+    const messages = document.createElement('div');
+    messages.id = 'chatMessages';
+    messages.style.flex = '1';
+    messages.style.overflowY = 'auto';
+    messages.style.border = '1px solid #444';
+    messages.style.padding = '10px';
+    messages.style.borderRadius = '8px';
+    messages.style.height = '300px';
+    messages.style.backgroundColor = '#2a2a2a';
+
+    // Input de mensaje
+    const input = document.createElement('input');
+    input.id = 'chatInput';
+    input.type = 'text';
+    input.placeholder = 'Escribe un mensaje...';
+    input.style.padding = '10px';
+    input.style.borderRadius = '6px';
+    input.style.border = '1px solid #555';
+    input.style.backgroundColor = '#333';
+    input.style.color = '#fff';
+    input.style.width = '100%';
+
+    // Botón de enviar
+    const sendBtn = document.createElement('button');
+    sendBtn.textContent = 'Enviar';
+    sendBtn.style.padding = '10px';
+    sendBtn.style.borderRadius = '6px';
+    sendBtn.style.backgroundColor = '#3498db';
+    sendBtn.style.color = 'white';
+    sendBtn.style.border = 'none';
+    sendBtn.style.cursor = 'pointer';
+
+    // Evento al hacer clic en enviar
+    sendBtn.addEventListener('click', () => {
+        const message = input.value.trim();
+        if (message) {
+            // Aquí luego enviaremos el mensaje con socket.emit
+            const p = document.createElement('p');
+            p.textContent = `Tú: ${message}`;
+            p.style.margin = '5px 0';
+            messages.appendChild(p);
+            messages.scrollTop = messages.scrollHeight;
+            input.value = '';
+        }
+    });
+
+    // Ensamblar el modal
+    content.appendChild(closeBtn);
+    content.appendChild(title);
+    content.appendChild(messages);
+    content.appendChild(input);
+    content.appendChild(sendBtn);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
 }
 
 

@@ -1,44 +1,31 @@
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-<script type="module" src="/javascripts/dashboard/dashboard.js" ></script>
+<script type="module" src="/javascripts/dashboard/dashboard.js"></script>
 
 
 <body>
 
     <div class="grid grid-cols-2" id="navBarBackground"> <!--Nav bar lateral + background games-->
 
-        <div id="navBar">
+
+        <%- include('navBarGeneral') %>
+
+            <div id="welcome-Games">
+
+                <h1 id="welcome-user"></h1>
 
 
-            <div id="options">
-                <h3>Platforms</h3>
-
-
-
-            </div>
+                <div id="welcome-Games-content">
 
 
 
 
-
-        </div>
-
-        <div id="welcome-Games">
-
-            <h1 id="welcome-user"></h1>
-
-
-            <div id="welcome-Games-content">
-
-
+                </div>
 
 
             </div>
-
-
-        </div>
 
     </div>
 
 
-  
+
 </body>
