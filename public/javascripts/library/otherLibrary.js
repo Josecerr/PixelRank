@@ -20,13 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     imageSrc.src = user.avatar;
 
 
-    showLibrary(user);
-
-})
-
-pixelRank.addEventListener('mouseover',()=>{
-
-    pixelRank.style.cursor = 'pointer';
+    showLibrary(userFriend);
 
 })
 
@@ -49,21 +43,21 @@ myAccount.addEventListener('click', () => {
 
 logOut.addEventListener('click', () => {
 
-    logOutUser();
+    logOutUser(user);
 
 
 
 })
 myFriends.addEventListener('click', () => {
 
-    showFriend();
+    showFriend(user);
 
 })
 
 addFriends.addEventListener('click', () => {
 
 
-    searchFriendsByUsername();
+    searchFriendsByUsername(user);
 
 })
 
@@ -89,8 +83,8 @@ buttonSearchGame.addEventListener('click', (e) => {
 });
 
 
-function showLibrary() {
-
+function showLibrary(userFriend) {
+    const userID = userFriend.id;
 
 
     const divContent = document.getElementById('games-library');
@@ -117,7 +111,7 @@ function showLibrary() {
     divContent.appendChild(loaderWrapper);
 
 
-    fetch('/users/getLibrary')
+    fetch(`/users/getLibraryOthers?id=${userID}`)
         .then(response => {
             if (!response.ok) throw new Error('Error al obtener la biblioteca');
             return response.json();
@@ -146,7 +140,7 @@ function showLibrary() {
           <div class="header-overlay">
             <div class="header-content">
               <p>${juegos.length} GAMES</p>
-              <h1>Your Library ${user.username}</h1>
+              <h1> Library of ${userFriend.username}</h1>
             </div>
           </div>
         `;
@@ -167,7 +161,7 @@ function showLibrary() {
               <h3>${juego.name}</h3>
               <p>${juego.genres?.map(g => g.name).join(', ') || ''}</p>
               <label class="status-label">Status from Library</label>
-              <select class="select-status" data-gameid="${juego.id}">
+              <select class="select-status" data-gameid="${juego.id}" disabled>
                 <option value="playing" ${juego.status === 'pending' ? 'selected' : ''}>Pending</option>
                 <option value="completed" ${juego.status === 'completed' ? 'selected' : ''}>Completed</option>
                 <option value="wishlist" ${juego.status === 'wishlist' ? 'selected' : ''}>Wishlist</option>
@@ -186,13 +180,7 @@ function showLibrary() {
                     })
                     const select = card.querySelector('select');
 
-                    select.addEventListener('change', (e) => {
-
-                        const status = e.target.value;
-                        updateStatusGame(juego.id, status);
-
-
-                    })
+                  
 
 
                     juegosContainer.appendChild(card);
@@ -210,7 +198,7 @@ function showLibrary() {
                     <div class="header-overlay">
                         <div class="header-content">
                             <p>NO GAMES IN</p>
-                            <h1>Your Library ${user.username}</h1>
+                            <h1> THE LIBRARY OF ${userFriend}</h1>
                         </div>
                     </div>
                 `;
@@ -225,97 +213,3 @@ function showLibrary() {
 
 
 
-function updateStatusGame(juegoID, status) {
-
-
-
-    if (status === "completed") {
-
-        const dataBod = {
-
-            juegoID: juegoID
-
-
-        }
-
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataBod)
-        };
-
-        fetch('users/updateStatusCompleted', requestOptions)
-            .then(response => {
-
-                if (!response.ok) {
-
-                    throw new Error("Error updating status");
-
-                }
-
-                return response.json();
-
-
-            })
-            .then(result => {
-
-                showLibrary();
-
-
-            }).catch(err => {
-
-                window.location.href = "error";
-
-
-            });
-
-
-
-    } else if (status === "wishlist" || status === "playing") {
-
-        const dataBod = {
-
-            juegoID: juegoID,
-            status: status
-
-        }
-
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dataBod)
-        };
-
-        fetch('users/updateStatus', requestOptions)
-            .then(response => {
-
-                if (!response.ok) {
-
-                    throw new Error("Error updating the status");
-
-                }
-                return response.json();
-
-
-            })
-            .then(result => {
-
-                showLibrary();
-
-            }).catch(err => {
-
-                window.location.href = "error";
-
-
-            });
-
-
-
-    }
-
-
-}

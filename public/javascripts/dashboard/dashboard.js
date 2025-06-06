@@ -4,7 +4,7 @@ import { updateUser } from "../indexFunctions/register-login/auth.js";
 
 
 //Sección para coger datos generales y funciones
- 
+
 
 const myAccount = document.getElementById('myAccount');
 const addFriends = document.getElementById('addFriends');
@@ -12,7 +12,7 @@ const myFriends = document.getElementById('myFriends');
 const logOut = document.getElementById('logout');
 const myLibrary = document.getElementById('myLibrary');
 
-const user=document.getElementById('userLogged');
+const user = document.getElementById('userLogged');
 
 const buttonSearchGame = document.getElementById('searchGame');
 
@@ -50,10 +50,10 @@ export function initDashboard(user) {
 
             console.log(user);
             showMyAccount(user);
-            
-        
+
+
         })
-        
+
 
 
     })
@@ -418,7 +418,7 @@ function showMyAccount(user) {
     img.style.width = '20%';
     img.style.height = '20%'
 
-    
+
     const avatarLabel = document.createElement('label');
     avatarLabel.textContent = "Profile Picture:";
     const avatarInput = document.createElement('input');
@@ -521,7 +521,7 @@ logOut.addEventListener('click', () => {
 
 function logOutUser() {
 
-    fetch('users/logout')
+    fetch('/users/logout')
         .then(() => {
 
             window.location.href = '/';
@@ -729,7 +729,7 @@ function sendFriendship(userFriendID, addBtn) {
     };
 
 
-    fetch('users/sendFriendship', requestOptions)
+    fetch('/users/sendFriendship', requestOptions)
         .then(response => {
 
             if (!response.ok) {
@@ -804,7 +804,7 @@ function showFriend() {
     title.style.fontSize = '3.5vh';
     content.appendChild(title);
 
-    fetch('users/getFriends')
+    fetch('/users/getFriends')
         .then(response => {
             if (!response.ok) {
                 throw new Error("Error getting friends");
@@ -841,7 +841,15 @@ function showFriend() {
                 content.appendChild(amigosTitle);
 
                 amigosAceptados.forEach(user => {
-                    const userCard = createUserCard(user);
+                    const userCard = createUserCardAccepted(user);
+
+                    userCard.addEventListener('click', () => {
+
+                        showOthersLibrary(user);
+
+
+                    })
+
                     content.appendChild(userCard);
                 });
             }
@@ -924,6 +932,50 @@ function showFriend() {
         return userDiv;
     }
 
+
+    function createUserCardAccepted(result) {
+        const userDiv = document.createElement('div');
+        userDiv.style.display = 'flex';
+        userDiv.style.justifyContent = 'space-between';
+        userDiv.style.alignItems = 'center';
+        userDiv.style.borderBottom = '1px solid #ddd';
+        userDiv.style.padding = '5px 0';
+        userDiv.style.width = '100%';
+
+        const infoContainer = document.createElement('div');
+        infoContainer.style.display = 'flex';
+        infoContainer.style.alignItems = 'center';
+        infoContainer.style.gap = '10px';
+
+        const avatarImg = document.createElement('img');
+        avatarImg.src = result.avatar;
+        avatarImg.alt = `${result.username}'s avatar`;
+        avatarImg.style.width = '40px';
+        avatarImg.style.height = '40px';
+        avatarImg.style.borderRadius = '50%';
+        avatarImg.style.objectFit = 'cover';
+
+        const userInfo = document.createElement('span');
+        userInfo.textContent = `${result.username} (${result.email})`;
+
+
+        const userInfoContainer = document.createElement('div');
+        userInfoContainer.style.display = 'flex';
+        userInfoContainer.style.alignItems = 'center';
+        userInfoContainer.style.gap = '10px';
+
+        userInfoContainer.appendChild(userInfo);
+
+
+        infoContainer.appendChild(avatarImg);
+        infoContainer.appendChild(userInfoContainer);
+        userDiv.appendChild(infoContainer);
+
+        return userDiv;
+    }
+
+
+
 }
 
 function acceptFriendShip(IDFriendship, estadoBtn) {
@@ -965,15 +1017,30 @@ function acceptFriendShip(IDFriendship, estadoBtn) {
             showFriend();
 
 
+        }).catch(err => {
+
+            window.location.href = "error"
+
         })
 
 
 
 }
+
+function showOthersLibrary(user) {
+    window.location.href = `/otherLibrary/usersLibrary?friendId=${user.id}`;
+}
+
+
+
 if (myLibrary) {
     myLibrary.addEventListener('click', () => {
         window.location.href = '/myLibrary';
     });
 }
+
+
+
+
 
 export { showMyAccount, showFriend, logOutUser, searchFriendsByUsername }

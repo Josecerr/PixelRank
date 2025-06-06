@@ -286,26 +286,20 @@ router.post('/verifyLibrary', async (req, res) => {
 
 router.get('/getLibrary', async (req, res) => {
 
-   
+
     try {
 
         const userID = req.session.user.id;
 
         const result = await connBBDD.getLibrary(userID);
 
-        const id = [];
-
-        for (i = 0; i < result.length; i++) {
-
-            id.push(result[i].game_id);
-
-        }
-
-
         const juegos = [];
-        for (let i = 0; i < id.length; i++) {
-            const juego = await rawgApi.obtenerJuegoPorId(id[i]);
-            if (juego) juegos.push(juego); 
+
+        for (const { game_id, status } of result) {
+            const juego = await rawgApi.obtenerJuegoPorId(game_id);
+            if (juego) {
+                juegos.push({ ...juego, status });
+            }
         }
 
         res.json(juegos);
@@ -324,6 +318,89 @@ router.get('/getLibrary', async (req, res) => {
 
 })
 
+
+router.get('/getLibraryOthers', async (req, res) => {
+
+
+    try {
+
+        const userID = req.query.id;
+
+        const result = await connBBDD.getLibrary(userID);
+
+        const juegos = [];
+
+        for (const { game_id, status } of result) {
+            const juego = await rawgApi.obtenerJuegoPorId(game_id);
+            if (juego) {
+                juegos.push({ ...juego, status });
+            }
+        }
+
+        res.json(juegos);
+
+
+    } catch (error) {
+
+        res.status(500).render('error', { message: 'Error interno del servidor' });
+
+
+    }
+
+
+
+
+
+})
+
+
+router.post('/updateStatusCompleted', async (req, res) => {
+
+    try {
+
+        const { juegoID } = req.body;
+
+        const userID = req.session.user.id;
+
+        const result = await connBBDD.updateStatusDelete(userID, juegoID);
+
+
+        res.json(result);
+
+
+
+    } catch (error) {
+
+        res.status(500).json('error', { message: 'Error updating status' });
+
+    }
+
+
+})
+
+router.post('/updateStatus', async (req, res) => {
+
+    try {
+
+        const { juegoID, status } = req.body;
+
+        const userID = req.session.user.id;
+
+        const result= await connBBDD.updateStatus(userID,juegoID,status);
+
+        res.json(result);
+
+
+
+    } catch (error) {
+
+        res.status(500).json('error', { message: 'Error updating status' });
+
+    }
+
+
+
+})
 
 
 module.exports = router;

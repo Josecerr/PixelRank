@@ -52,7 +52,7 @@ const insertUser = (username, email, hashedPassword) => {
 
 const getUserById = (userID) => {
 
-  const sql = "SELECT avatar, username FROM USERS WHERE ID=?"
+  const sql = "SELECT id, avatar, username FROM USERS WHERE ID=?"
 
   return new Promise((resolve, reject) => {
 
@@ -328,7 +328,7 @@ const getLibrary = (userID) => {
 
   return new Promise((resolve, reject) => {
 
-    const sql = "SELECT game_id from user_games where user_id=?";
+    const sql = "SELECT game_id, status from user_games where user_id=?";
 
     connection.query(sql, [userID], (err, result) => {
 
@@ -346,5 +346,47 @@ const getLibrary = (userID) => {
 
 }
 
+const updateStatusDelete = (userID, gameID) => {
 
-module.exports = { connection, insertUser, loginUser, getUserById, updateUser, postReview, getReviews, searchFriends, addFriendship, getFriends, acceptFriend, verifyGameLibrary, addToLibrary,getLibrary }
+  return new Promise((resolve, reject) => {
+
+    const sql = "DELETE FROM USER_GAMES WHERE USER_ID= ? AND GAME_ID= ?";
+
+    connection.query(sql, [userID, gameID], (err, result) => {
+
+      if (err) return reject(err);
+
+      resolve(result);
+
+
+    })
+
+
+  })
+
+
+}
+const updateStatus=(userID,gameID,status)=>{
+
+  return new Promise((resolve,reject)=>{
+
+    const sql = "UPDATE user_games SET status = ? WHERE user_id = ? AND game_id = ?";
+
+    connection.query(sql,[status,userID,gameID],(err,result)=>{
+
+      if(err) return reject(err);
+
+      resolve(result);
+
+
+    })
+
+
+  })
+
+
+
+}
+
+
+module.exports = { connection, insertUser, loginUser, getUserById, updateUser, postReview, getReviews, searchFriends, addFriendship, getFriends, acceptFriend, verifyGameLibrary, addToLibrary, getLibrary,updateStatusDelete,updateStatus }

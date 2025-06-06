@@ -45,6 +45,7 @@ var obtenerUsuarios = require('./routes/users');
 var mostrarDashboard=require('./routes/dashboard');
 var showGame=require('./routes/gameShow');
 var library=require('./routes/myLibrary');
+var otherLibrary=require('./routes/othersLibrary');
 
 //Middleware que me permitirá usar user en cualquier ejs.
 app.use((req, res, next) => {
@@ -59,6 +60,7 @@ app.use('/users', obtenerUsuarios);
 app.use('/dashboard', mostrarDashboard);
 app.use('/showGame',showGame);
 app.use('/',library);
+app.use('/otherLibrary',otherLibrary);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
