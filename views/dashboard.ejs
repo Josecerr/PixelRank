@@ -18,16 +18,18 @@
 
 
         <%- include('bodyDash') %>
+            <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
             <script type="module">
-                //Si es modular del todo, se cargará todas las funciones y no queremos eso
+                //Si es modular del todo, se cargaran todas las funciones y no queremos eso
                 const user = <%- JSON.stringify(user) %>;
 
-        
-                
+
+
                 import { initDashboard } from '/javascripts/dashboard/dashboard.js';
                 initDashboard(user);
             </script>
+
 
 
 </body>

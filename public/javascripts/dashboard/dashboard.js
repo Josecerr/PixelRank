@@ -3,6 +3,8 @@ import { updateUser } from "../indexFunctions/register-login/auth.js";
 
 
 
+
+
 //Sección para coger datos generales y funciones
 
 
@@ -23,7 +25,9 @@ export function initDashboard(user) {
 
     document.addEventListener('DOMContentLoaded', () => {
 
-
+        const socket = io(); // se conecta automáticamente al mismo host y puerto
+        window.currentUserId = user.id;
+        window.socket = socket;
         const h1Title = document.getElementById('welcome-user');
 
         if (h1Title) {
@@ -167,6 +171,35 @@ function getGames() {
                 }
 
 
+                const pRating = document.createElement('p');
+                pRating.textContent = 'Loading rating...';
+                pRating.style.color = '#ffc107'; // Amarillo tipo estrella
+                pRating.style.fontWeight = 'bold';
+                pRating.style.fontSize = '14px';
+                pRating.style.padding = '6px 12px';
+                pRating.style.background = 'rgba(0, 0, 0, 0.6)';
+                pRating.style.border = '1px solid #ffc107';
+                pRating.style.borderRadius = '10px';
+                pRating.style.textAlign = 'center';
+                pRating.style.marginTop = '8px';
+                pRating.style.boxShadow = '0 0 5px #ffc107aa';
+
+
+
+                fetch(`/users/rating/${game.id}`)
+                .then(res => res.json())
+                .then(data => {
+                  if (data && data.average_rating !== null) {
+                    pRating.textContent = `Rating ${parseFloat(data.average_rating).toFixed(1)} ⭐`;
+                  } else {
+                    divDetails.removeChild(pRating);
+                    pRating.textContent = '';
+                  }
+                })
+                .catch(() => {
+                  pRating.textContent = 'Error loading rating';
+                });
+              
 
 
 
@@ -175,7 +208,7 @@ function getGames() {
                 div.appendChild(h2);
 
                 divDetails.appendChild(platformIconsDiv);
-
+                divDetails.appendChild(pRating);
 
                 div.appendChild(divDetails);
                 divContent.appendChild(div);
@@ -855,7 +888,7 @@ function showFriend() {
                 amigosAceptados.forEach(user => {
                     const userCard = createUserCardAccepted(user);
 
-                    userCard.addEventListener('mouseover',()=>{
+                    userCard.addEventListener('mouseover', () => {
 
                         userCard.style.cursor = 'pointer';
 
@@ -957,12 +990,12 @@ function showFriend() {
         userDiv.style.borderBottom = '1px solid #ddd';
         userDiv.style.padding = '5px 0';
         userDiv.style.width = '100%';
-    
+
         const infoContainer = document.createElement('div');
         infoContainer.style.display = 'flex';
         infoContainer.style.alignItems = 'center';
         infoContainer.style.gap = '10px';
-    
+
         const avatarImg = document.createElement('img');
         avatarImg.src = result.avatar;
         avatarImg.alt = `${result.username}'s avatar`;
@@ -970,22 +1003,22 @@ function showFriend() {
         avatarImg.style.height = '40px';
         avatarImg.style.borderRadius = '50%';
         avatarImg.style.objectFit = 'cover';
-    
+
         const userInfo = document.createElement('span');
         userInfo.textContent = `${result.username} (${result.email})`;
-    
+
         const userInfoContainer = document.createElement('div');
         userInfoContainer.style.display = 'flex';
         userInfoContainer.style.alignItems = 'center';
         userInfoContainer.style.gap = '10px';
-    
+
         userInfoContainer.appendChild(userInfo);
-    
+
         infoContainer.appendChild(avatarImg);
         infoContainer.appendChild(userInfoContainer);
         userDiv.appendChild(infoContainer);
-    
-       
+
+
         const chatButton = document.createElement('button');
         chatButton.textContent = 'Chat';
         chatButton.style.padding = '6px 12px';
@@ -994,20 +1027,20 @@ function showFriend() {
         chatButton.style.border = 'none';
         chatButton.style.borderRadius = '6px';
         chatButton.style.cursor = 'pointer';
-    
-   
+
+
         chatButton.addEventListener('click', (e) => {
             e.stopPropagation();
-        
+
             chatModal(result);
 
         });
-    
-        userDiv.appendChild(chatButton); 
-    
+
+        userDiv.appendChild(chatButton);
+
         return userDiv;
     }
-    
+
 
 
 
@@ -1075,105 +1108,160 @@ if (myLibrary) {
 }
 
 function chatModal(userFriend) {
-    // Elimina el modal anterior si existe
-    const existing = document.getElementById('chatModal');
+
+
+
+    const existing = document.getElementById('modal-add-friends');
     if (existing) existing.remove();
 
-    // Crea el fondo del modal
+
+    const overlay = document.createElement('div');
+    overlay.id = 'chatModal';
+    overlay.style.position = 'fixed';
+    overlay.style.top = 0;
+    overlay.style.left = 0;
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.background = 'rgba(0,0,0,0.7)';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = 1000;
+
+    // Crear el contenedor del modal
     const modal = document.createElement('div');
-    modal.id = 'chatModal';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
+    modal.style.width = '450px';
+    modal.style.maxHeight = '80vh';
+    modal.style.background = '#1e1e1e';
+    modal.style.borderRadius = '12px';
+    modal.style.overflow = 'hidden';
     modal.style.display = 'flex';
-    modal.style.justifyContent = 'center';
-    modal.style.alignItems = 'center';
-    modal.style.zIndex = '1000';
+    modal.style.flexDirection = 'column';
+    modal.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
+    modal.style.position = 'relative';
 
-    // Contenido del modal
-    const content = document.createElement('div');
-    content.style.backgroundColor = '#1e1e1e';
-    content.style.borderRadius = '12px';
-    content.style.padding = '20px';
-    content.style.width = '400px';
-    content.style.maxHeight = '80vh';
-    content.style.display = 'flex';
-    content.style.flexDirection = 'column';
-    content.style.gap = '10px';
-    content.style.color = 'white';
+    // Cabecera del modal
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.alignItems = 'center';
+    header.style.padding = '15px';
+    header.style.background = '#2a2a2a';
 
-    
-    const title = document.createElement('h2');
-    title.textContent = `Chat with ${userFriend.username}`;
-    title.style.margin = '0';
+    const avatar = document.createElement('img');
+    avatar.src = userFriend.avatar;
+    avatar.style.width = '60px';
+    avatar.style.height = '60px';
+    avatar.style.borderRadius = '50%';
+    avatar.style.objectFit = 'cover';
+    avatar.style.marginRight = '15px';
 
+    const username = document.createElement('h3');
+    username.textContent = "Talking with " + userFriend.username;
+    username.style.color = '#fff';
+    username.style.margin = 0;
 
-    const closeBtn = document.createElement('span');
-    closeBtn.textContent = '✖';
-    closeBtn.style.alignSelf = 'flex-end';
-    closeBtn.style.cursor = 'pointer';
-    closeBtn.style.fontSize = '20px';
-    closeBtn.addEventListener('click', () => modal.remove());
+    header.appendChild(avatar);
+    header.appendChild(username);
 
-  
+    // Contenedor de mensajes
     const messages = document.createElement('div');
     messages.id = 'chatMessages';
-    messages.style.flex = '1';
+    messages.style.flex = 1;
     messages.style.overflowY = 'auto';
-    messages.style.border = '1px solid #444';
-    messages.style.padding = '10px';
-    messages.style.borderRadius = '8px';
-    messages.style.height = '300px';
-    messages.style.backgroundColor = '#2a2a2a';
+    messages.style.padding = '15px';
+    messages.style.background = '#121212';
+    messages.style.color = '#fff';
+    messages.style.fontSize = '14px';
 
-    // Input de mensaje
+    // Controles de entrada
+    const inputContainer = document.createElement('div');
+    inputContainer.style.display = 'flex';
+    inputContainer.style.padding = '10px';
+    inputContainer.style.background = '#1e1e1e';
+
     const input = document.createElement('input');
-    input.id = 'chatInput';
     input.type = 'text';
-    input.placeholder = 'Escribe un mensaje...';
+    input.placeholder = 'Write a message...';
+    input.style.flex = 1;
     input.style.padding = '10px';
+    input.style.border = 'none';
     input.style.borderRadius = '6px';
-    input.style.border = '1px solid #555';
-    input.style.backgroundColor = '#333';
+    input.style.marginRight = '10px';
+    input.style.background = '#2a2a2a';
     input.style.color = '#fff';
-    input.style.width = '100%';
 
-    // Botón de enviar
     const sendBtn = document.createElement('button');
-    sendBtn.textContent = 'Enviar';
-    sendBtn.style.padding = '10px';
-    sendBtn.style.borderRadius = '6px';
-    sendBtn.style.backgroundColor = '#3498db';
-    sendBtn.style.color = 'white';
+    sendBtn.textContent = 'Send';
+    sendBtn.style.padding = '10px 15px';
+    sendBtn.style.background = '#4caf50';
+    sendBtn.style.color = '#fff';
     sendBtn.style.border = 'none';
+    sendBtn.style.borderRadius = '6px';
     sendBtn.style.cursor = 'pointer';
 
-    // Evento al hacer clic en enviar
+    inputContainer.appendChild(input);
+    inputContainer.appendChild(sendBtn);
+
+    // Botón para cerrar
+    const closeBtn = document.createElement('span');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.style.position = 'absolute';
+    closeBtn.style.top = '10px';
+    closeBtn.style.right = '15px';
+    closeBtn.style.fontSize = '24px';
+    closeBtn.style.color = '#fff';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.addEventListener('click', () => {
+        overlay.remove();
+    });
+
+    // Montar todo
+    modal.appendChild(header);
+    modal.appendChild(messages);
+    modal.appendChild(inputContainer);
+    modal.appendChild(closeBtn);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+
+
+
+    // Enviar mensaje (lógica de socket se añade después)
     sendBtn.addEventListener('click', () => {
-        const message = input.value.trim();
-        if (message) {
-            // Aquí luego enviaremos el mensaje con socket.emit
+        const text = input.value.trim();
+        if (text) {
             const p = document.createElement('p');
-            p.textContent = `Tú: ${message}`;
-            p.style.margin = '5px 0';
+            p.textContent = `Tú: ${text}`;
             messages.appendChild(p);
-            messages.scrollTop = messages.scrollHeight;
             input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+
+            // Emitimos el mensaje al servidor via socket
+            if (window.socket && window.currentUserId) {
+                window.socket.emit('privateMessage', {
+                    from: window.currentUserId,
+                    to: userFriend.id,
+                    message: text
+                });
+            }
         }
     });
 
-    // Ensamblar el modal
-    content.appendChild(closeBtn);
-    content.appendChild(title);
-    content.appendChild(messages);
-    content.appendChild(input);
-    content.appendChild(sendBtn);
-    modal.appendChild(content);
-    document.body.appendChild(modal);
+    if (window.socket && window.currentUserId) {
+        window.socket.on(`messageTo:${window.currentUserId}`, ({ from, message }) => {
+            if (from === userFriend.id) {
+                const p = document.createElement('p');
+                p.textContent = `${userFriend.username}: ${message}`;
+                messages.appendChild(p);
+                messages.scrollTop = messages.scrollHeight;
+            }
+        });
+    }
+
+
+
 }
+
 
 
 

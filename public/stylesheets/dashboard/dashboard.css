@@ -209,7 +209,8 @@ body {
     width: 80%;
     height: 350px;
     border-radius: 20px;
-    background-color: rgb(32, 32, 32);
+    overflow: hidden;
+    background-color: #1e1e1e;
     margin-bottom: 25px;
     align-items: center;
     justify-content: center;
@@ -236,9 +237,9 @@ body {
 
 #images {
 
-    border-radius: 20px;
-    height: 170px;
-    width: 100%;
+     width: 100%;
+    height: 22vh;
+    object-fit: cover;
 }
 
 #game-content {
@@ -461,3 +462,110 @@ body {
         transform: rotate(360deg);
     }
 }
+@media (max-width: 1200px) {
+    #navBarBackground #welcome-Games #welcome-Games-content {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (max-width: 992px) {
+    #navBarBackground {
+      grid-template-columns: 1fr;
+    }
+  
+    #navBar {
+      display: flex;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  
+    #navBar #options {
+      width: 100%;
+    }
+  
+    #index-header {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  
+    #index-header #title {
+      flex-direction: column;
+    }
+  
+    #index-header input {
+      width: 90%;
+    }
+  
+    #navBarBackground #welcome-Games #welcome-Games-content {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    #game-info {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    #game-cover {
+      width: 100%;
+    }
+  
+    #review-data textarea {
+      width: 90%;
+    }
+  
+    #send-review #sendReview {
+      width: 60%;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    #index-header h1 {
+      font-size: 2.5rem;
+    }
+  
+    #index-header #navegation button {
+      font-size: 16px;
+    }
+  
+    #cardVideogames {
+      height: 300px;
+    }
+  
+    #navBarBackground #welcome-Games #welcome-Games-content {
+      grid-template-columns: 1fr;
+    }
+  
+    #game-header h1 {
+      font-size: 1.5rem;
+    }
+  
+    #captures-container img {
+      height: 150px;
+    }
+  
+    #welcome-reviews {
+      font-size: 4vh;
+    }
+  
+    .star-rating {
+      font-size: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 400px) {
+    #index-header input {
+      width: 100%;
+    }
+  
+    #send-review #sendReview {
+      width: 100%;
+    }
+  
+    #review-data textarea {
+      height: 30vh;
+    }
+  
+    #captures-container img {
+      height: 120px;
+    }
+  }

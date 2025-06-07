@@ -345,6 +345,23 @@ const getLibrary = (userID) => {
 
 
 }
+//Para obtener la media de los juegos :)
+const getRatings = (gameId) => {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT AVG(rating) AS average_rating 
+      FROM reviews 
+      WHERE rawg_game_id = ?
+    `;
+    connection.query(sql, [gameId], (err, results) => {
+      if (err) return reject(err);
+      resolve(results[0]); // results[0].average_rating
+    });
+  });
+};
+
+
+
 
 const updateStatusDelete = (userID, gameID) => {
 
@@ -389,4 +406,4 @@ const updateStatus=(userID,gameID,status)=>{
 }
 
 
-module.exports = { connection, insertUser, loginUser, getUserById, updateUser, postReview, getReviews, searchFriends, addFriendship, getFriends, acceptFriend, verifyGameLibrary, addToLibrary, getLibrary,updateStatusDelete,updateStatus }
+module.exports = { connection, insertUser, loginUser, getUserById, updateUser, postReview, getReviews, searchFriends, addFriendship, getFriends, acceptFriend, verifyGameLibrary, addToLibrary, getLibrary,updateStatusDelete,updateStatus ,getRatings}

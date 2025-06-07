@@ -401,6 +401,20 @@ router.post('/updateStatus', async (req, res) => {
 
 
 })
+//Esta función muestra los ratings
+router.get('/rating/:gameId', async (req, res) => {
+    const gameId = req.params.gameId;
 
+    try {
+      
+        const result=await connBBDD.getRatings(gameId);
+
+        res.json(result);
+
+    } catch (err) {
+        console.error('Error al obtener el rating medio:', err);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
 
 module.exports = router;
