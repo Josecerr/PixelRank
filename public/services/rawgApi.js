@@ -143,6 +143,55 @@ async function obtenerJuegoPorID(id) {
     throw error;
   }
 }
+const PLATFORM_IDS = {
+  pc: [4],
+  xbox: [1, 186, 14],
+  playstation: [18, 16, 187, 27],
+  nintendo: [7, 8, 9],
+  android: [21],
+  mac: [5]
+};
+
+async function obtenerJuegosPorPlataforma(plataforma) {
+  if (!PLATFORM_IDS[plataforma]) {
+    throw new Error(`Plataforma no válida: ${plataforma}`);
+  }
+
+  try {
+    const response = await axios.get(`${BASE_URL}/games`, {
+      params: {
+        key: RAWG_API_KEY,
+        platforms: PLATFORM_IDS[plataforma].join(','),
+        page_size: 20,
+        ordering: '-rating'
+      }
+    });
+
+    return response.data.results;
+
+  } catch (error) {
+    console.error(`Error obteniendo juegos por plataforma (${plataforma}):`, error.message);
+    throw error;
+  }
+}
+
+async function obtenerJuegosPorGenero(genreSlug) {
+  try {
+    const response = await axios.get(`${BASE_URL}/games`, {
+      params: {
+        key: RAWG_API_KEY,
+        genres: genreSlug,
+        page_size: 20
+      }
+    });
+
+    return response.data.results;
+
+  } catch (error) {
+    console.error('Error al obtener juegos por género:', error.message);
+    throw error;
+  }
+}
 
 
 
@@ -153,5 +202,6 @@ module.exports = {
   obtenerScreenshots,
   obtenerTrailers,
   obtenerJuegoPorNombre,
-  obtenerJuegoPorId
+ obtenerJuegosPorPlataforma,
+ obtenerJuegosPorGenero
 };

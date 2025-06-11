@@ -25,7 +25,29 @@ export function initDashboard(user) {
 
     document.addEventListener('DOMContentLoaded', () => {
 
-        const socket = io(); // se conecta automáticamente al mismo host y puerto
+
+
+        const paramsPlatform = new URLSearchParams(window.location.search);
+        const platform = paramsPlatform.get('platform');
+
+        const params = new URLSearchParams(window.location.search);
+        const search = params.get('search');
+
+        const paramsGenres = new URLSearchParams(window.location.search);
+        const genres = paramsGenres.get('genre');
+
+
+        if (platform) {
+            filterGamesByPlatform(platform);
+        } else if (search) {
+            buscarJuego(search);
+        } else if (genres) {
+            filterGamesByGenre(genres);
+        } else {
+            getGames();
+        }
+
+        const socket = io(); 
         window.currentUserId = user.id;
         window.socket = socket;
         const h1Title = document.getElementById('welcome-user');
@@ -38,18 +60,13 @@ export function initDashboard(user) {
         const imageSrc = document.getElementById('img-data-user');
         imageSrc.src = user.avatar;
 
-        const params = new URLSearchParams(window.location.search);
-        const search = params.get('search');
-
-        getGames();
 
 
-        if (search) {
-            const input = document.getElementById('default-search');
-            input.value = search;
 
-            buscarJuego(search);
-        }
+
+
+
+
 
         myAccount.addEventListener('click', () => {
 
@@ -65,21 +82,7 @@ export function initDashboard(user) {
 
 
 }
-
-pixelRank.addEventListener('mouseover', () => {
-
-    pixelRank.style.cursor = 'pointer';
-
-})
-
-pixelRank.addEventListener('click', () => {
-
-    window.location.href = "/dashboard";
-
-
-})
-
-
+//Mostrar todos los juegos
 function getGames() {
     // Logos
 
@@ -141,6 +144,13 @@ function getGames() {
                 h2.textContent = game.name;
                 h2.id = 'cardVideogames-Title';
 
+                const genres = document.createElement('p');
+                genres.textContent = game.genres.map(g => g.name).join(', ');
+                genres.style.color = "white";
+                genres.style.textAlign = "center";
+                genres.style.fontFamily = "play";
+
+
                 const divDetails = document.createElement('div');
                 divDetails.style.alignItems = "left";
                 divDetails.style.width = "100%";
@@ -162,8 +172,8 @@ function getGames() {
                             const img = document.createElement('img');
                             img.src = logoUrl;
                             img.alt = p.platform.name;
-                            img.style.width = '30px';
-                            img.style.height = '30px';
+                            img.style.width = '20px';
+                            img.style.height = '20px';
                             img.style.objectFit = 'contain';
                             platformIconsDiv.appendChild(img);
                         }
@@ -187,19 +197,19 @@ function getGames() {
 
 
                 fetch(`/users/rating/${game.id}`)
-                .then(res => res.json())
-                .then(data => {
-                  if (data && data.average_rating !== null) {
-                    pRating.textContent = `Rating ${parseFloat(data.average_rating).toFixed(1)} ⭐`;
-                  } else {
-                    divDetails.removeChild(pRating);
-                    pRating.textContent = '';
-                  }
-                })
-                .catch(() => {
-                  pRating.textContent = 'Error loading rating';
-                });
-              
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.average_rating !== null) {
+                            pRating.textContent = `Rating ${parseFloat(data.average_rating).toFixed(1)} ⭐`;
+                        } else {
+                            divDetails.removeChild(pRating);
+                            pRating.textContent = '';
+                        }
+                    })
+                    .catch(() => {
+                        pRating.textContent = 'Error loading rating';
+                    });
+
 
 
 
@@ -209,8 +219,9 @@ function getGames() {
 
                 divDetails.appendChild(platformIconsDiv);
                 divDetails.appendChild(pRating);
-
+                divDetails.appendChild(genres);
                 div.appendChild(divDetails);
+
                 divContent.appendChild(div);
 
                 div.addEventListener('mouseover', () => {
@@ -227,6 +238,432 @@ function getGames() {
             });
         });
 }
+
+
+
+
+//Para filtrar por plataformas
+document.querySelectorAll('.platform-list li').forEach(item => {
+    item.addEventListener('click', () => {
+        const platform = item.getAttribute('data-platform');
+
+        // Limpiar clases previas
+        document.querySelectorAll('.platform-list li').forEach(li => {
+            li.classList.remove('selected');
+        });
+
+        // Añadir clase al seleccionado
+        item.classList.add('selected');
+
+        // Mostrar texto seleccionado (opcional)
+        const selectedPlatformText = document.getElementById('selected-platform');
+        if (selectedPlatformText) {
+            selectedPlatformText.textContent = `Selected platform: ${item.textContent.trim()}`;
+        }
+
+        // Llamar a tu función que filtra
+        filterGamesByPlatform(platform);
+        ;
+    });
+});
+
+//Para filtrar por generos
+document.querySelectorAll('.genre-list li').forEach(item => {
+    item.addEventListener('click', () => {
+        const genre = item.getAttribute('data-genre');
+
+        // Elimina clase .selected de todos
+        document.querySelectorAll('.genre-list li').forEach(li => {
+            li.classList.remove('selected');
+        });
+
+        // Añade clase al actual
+        item.classList.add('selected');
+
+        // Filtra por género
+        filterGamesByGenre(genre);
+
+        // Mostrar el género seleccionado (opcional)
+        const genreTitle = document.getElementById('selected-genre');
+        if (genreTitle) {
+            genreTitle.textContent = `Selected genre: ${item.textContent.trim()}`;
+        }
+    });
+});
+
+
+
+
+
+function filterGamesByPlatform(platform) {
+
+    const divContent = document.getElementById('welcome-Games-content');
+    const loaderWrapper = document.createElement('div');
+    loaderWrapper.style.gridColumn = '1 / -1';
+    loaderWrapper.style.display = 'flex';
+    loaderWrapper.style.justifyContent = 'center';
+    loaderWrapper.style.height = '100%';
+
+    const loader = document.createElement('div');
+    loader.id = 'games-loader';
+    loader.style.border = '6px solid #f3f3f3';
+    loader.style.borderTop = '6px solid #3498db';
+    loader.style.borderRadius = '50%';
+    loader.style.width = '40px';
+    loader.style.height = '40px';
+    loader.style.animation = 'spin 1s linear infinite';
+    loader.style.margin = '50px auto';
+    loader.style.display = 'block';
+
+    divContent.innerHTML = '';
+    loaderWrapper.appendChild(loader);
+    divContent.appendChild(loaderWrapper);
+
+
+
+
+
+    const platformLogos = {
+        pc: 'https://img.icons8.com/color/48/windows-10.png',
+        playstation: 'https://img.icons8.com/color/48/play-station.png',
+        xbox: 'https://img.icons8.com/fluency/48/xbox.png',
+        android: 'https://img.icons8.com/color/48/android-os.png',
+        mac: 'https://img.icons8.com/color/48/mac-logo.png',
+        nintendo: 'https://img.icons8.com/color/48/nintendo-switch-handheld.png'
+    };
+
+    const dataBod = {
+
+        platform: platform
+
+    }
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataBod)
+    };
+
+    fetch('getGames/mostrarPorPlataformas', requestOptions)
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error("Error showing by platforms");
+
+            }
+
+            return response.json();
+
+
+        })
+        .then(result => {
+            const divContent = document.getElementById('welcome-Games-content');
+            divContent.textContent = "";
+            result.forEach(game => {
+
+                const div = document.createElement('div');
+                div.id = 'cardVideogames';
+
+                const img = document.createElement('img');
+                img.id = 'images';
+                img.src = game.background_image;
+
+                const h2 = document.createElement('h2');
+                h2.textContent = game.name;
+                h2.id = 'cardVideogames-Title';
+
+                const genres = document.createElement('p');
+                genres.textContent = game.genres.map(g => g.name).join(', ');
+                genres.style.color = "white";
+                genres.style.textAlign = "center";
+                genres.style.fontFamily = "play";
+
+                const divDetails = document.createElement('div');
+                divDetails.style.alignItems = "left";
+                divDetails.style.width = "100%";
+                divDetails.style.alignContent = "center";
+                divDetails.style.alignItems = "center";
+                divDetails.style.justifyContent = "center";
+                divDetails.style.justifyItems = "center";
+
+                const platformIconsDiv = document.createElement('div');
+                platformIconsDiv.style.display = 'flex';
+                platformIconsDiv.style.gap = '5px';
+                platformIconsDiv.style.marginTop = '5px';
+
+                if (game.parent_platforms) {
+                    game.parent_platforms.forEach(p => {
+                        const slug = p.platform.slug;
+                        const logoUrl = platformLogos[slug];
+                        if (logoUrl) {
+                            const img = document.createElement('img');
+                            img.src = logoUrl;
+                            img.alt = p.platform.name;
+                            img.style.width = '20px';
+                            img.style.height = '20px';
+                            img.style.objectFit = 'contain';
+                            platformIconsDiv.appendChild(img);
+                        }
+                    });
+                }
+
+
+
+
+
+
+
+
+
+
+
+                div.appendChild(img);
+                div.appendChild(h2);
+
+                divDetails.appendChild(platformIconsDiv);
+
+
+                div.appendChild(divDetails);
+                div.appendChild(genres);
+
+                divContent.appendChild(div);
+
+                div.addEventListener('mouseover', () => {
+                    div.style.cursor = 'pointer';
+
+                });
+
+                div.addEventListener('mouseout', () => {
+                    div.style.cursor = 'default';
+                });
+
+                div.addEventListener('click', () => {
+
+
+                    window.location.href = `/showGame?id=${game.id}`;
+
+
+
+
+                })
+
+            });
+
+
+        })
+
+
+
+
+
+
+
+}
+function filterGamesByGenre(genre) {
+
+    const divContent = document.getElementById('welcome-Games-content');
+    const loaderWrapper = document.createElement('div');
+    loaderWrapper.style.gridColumn = '1 / -1';
+    loaderWrapper.style.display = 'flex';
+    loaderWrapper.style.justifyContent = 'center';
+    loaderWrapper.style.height = '100%';
+
+    const loader = document.createElement('div');
+    loader.id = 'games-loader';
+    loader.style.border = '6px solid #f3f3f3';
+    loader.style.borderTop = '6px solid #3498db';
+    loader.style.borderRadius = '50%';
+    loader.style.width = '40px';
+    loader.style.height = '40px';
+    loader.style.animation = 'spin 1s linear infinite';
+    loader.style.margin = '50px auto';
+    loader.style.display = 'block';
+
+    divContent.innerHTML = '';
+    loaderWrapper.appendChild(loader);
+    divContent.appendChild(loaderWrapper);
+
+    const platformLogos = {
+        pc: 'https://img.icons8.com/color/48/windows-10.png',
+        playstation: 'https://img.icons8.com/color/48/play-station.png',
+        xbox: 'https://img.icons8.com/fluency/48/xbox.png',
+        android: 'https://img.icons8.com/color/48/android-os.png',
+        mac: 'https://img.icons8.com/color/48/mac-logo.png',
+        nintendo: 'https://img.icons8.com/color/48/nintendo-switch-handheld.png'
+    };
+
+    const dataBod = {
+
+        genre: genre
+
+    }
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataBod)
+    };
+
+    fetch('getGames/filterByGenre', requestOptions)
+        .then(response => {
+
+            if (!response.ok) {
+
+                throw new Error("Error getting games");
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(result => {
+
+            const divContent = document.getElementById('welcome-Games-content');
+            divContent.textContent = "";
+            result.forEach(game => {
+
+                const div = document.createElement('div');
+                div.id = 'cardVideogames';
+
+                const img = document.createElement('img');
+                img.id = 'images';
+                img.src = game.background_image;
+
+                const h2 = document.createElement('h2');
+                h2.textContent = game.name;
+                h2.id = 'cardVideogames-Title';
+
+
+                const genres = document.createElement('p');
+                genres.textContent = game.genres.map(g => g.name).join(', ');
+                genres.style.color = "white";
+                genres.style.textAlign = "center";
+                genres.style.fontFamily = "play";
+
+                const divDetails = document.createElement('div');
+                divDetails.style.alignItems = "left";
+                divDetails.style.width = "100%";
+                divDetails.style.alignContent = "center";
+                divDetails.style.alignItems = "center";
+                divDetails.style.justifyContent = "center";
+                divDetails.style.justifyItems = "center";
+
+                const platformIconsDiv = document.createElement('div');
+                platformIconsDiv.style.display = 'flex';
+                platformIconsDiv.style.gap = '5px';
+                platformIconsDiv.style.marginTop = '5px';
+
+                if (game.parent_platforms) {
+                    game.parent_platforms.forEach(p => {
+                        const slug = p.platform.slug;
+                        const logoUrl = platformLogos[slug];
+                        if (logoUrl) {
+                            const img = document.createElement('img');
+                            img.src = logoUrl;
+                            img.alt = p.platform.name;
+                            img.style.width = '20px';
+                            img.style.height = '20px';
+                            img.style.objectFit = 'contain';
+                            platformIconsDiv.appendChild(img);
+                        }
+                    });
+                }
+
+
+
+                const pRating = document.createElement('p');
+                pRating.textContent = 'Loading rating...';
+                pRating.style.color = '#ffc107'; // Amarillo tipo estrella
+                pRating.style.fontWeight = 'bold';
+                pRating.style.fontSize = '14px';
+                pRating.style.padding = '6px 12px';
+                pRating.style.background = 'rgba(0, 0, 0, 0.6)';
+                pRating.style.border = '1px solid #ffc107';
+                pRating.style.borderRadius = '10px';
+                pRating.style.textAlign = 'center';
+                pRating.style.marginTop = '8px';
+                pRating.style.boxShadow = '0 0 5px #ffc107aa';
+
+
+
+                fetch(`/users/rating/${game.id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.average_rating !== null) {
+                            pRating.textContent = `Rating ${parseFloat(data.average_rating).toFixed(1)} ⭐`;
+                        } else {
+                            divDetails.removeChild(pRating);
+                            pRating.textContent = '';
+                        }
+                    })
+                    .catch(() => {
+                        pRating.textContent = 'Error loading rating';
+                    });
+
+
+
+
+                div.appendChild(img);
+                div.appendChild(h2);
+
+                divDetails.appendChild(platformIconsDiv);
+                divDetails.appendChild(pRating);
+                divDetails.appendChild(genres);
+
+
+                div.appendChild(divDetails);
+
+
+                divContent.appendChild(div);
+
+                div.addEventListener('mouseover', () => {
+                    div.style.cursor = 'pointer';
+
+                });
+
+                div.addEventListener('mouseout', () => {
+                    div.style.cursor = 'default';
+                });
+
+                div.addEventListener('click', () => {
+
+
+                    window.location.href = `/showGame?id=${game.id}`;
+
+
+
+
+                })
+
+            });
+
+
+        })
+
+
+
+
+
+}
+
+
+pixelRank.addEventListener('mouseover', () => {
+
+    pixelRank.style.cursor = 'pointer';
+
+})
+
+pixelRank.addEventListener('click', () => {
+
+    window.location.href = "/dashboard";
+
+
+})
+
 
 
 buttonSearchGame.addEventListener('click', (e) => {
@@ -326,6 +763,13 @@ function buscarJuego(value) {
                 h2.textContent = game.name;
                 h2.id = 'cardVideogames-Title';
 
+
+                const genres = document.createElement('p');
+                genres.textContent = game.genres.map(g => g.name).join(', ');
+                genres.style.color = "white";
+                genres.style.textAlign = "center";
+                genres.style.fontFamily = "play";
+
                 const divDetails = document.createElement('div');
                 divDetails.style.alignItems = "left";
                 divDetails.style.width = "100%";
@@ -347,8 +791,8 @@ function buscarJuego(value) {
                             const img = document.createElement('img');
                             img.src = logoUrl;
                             img.alt = p.platform.name;
-                            img.style.width = '30px';
-                            img.style.height = '30px';
+                            img.style.width = '20px';
+                            img.style.height = '20px';
                             img.style.objectFit = 'contain';
                             platformIconsDiv.appendChild(img);
                         }
@@ -357,10 +801,34 @@ function buscarJuego(value) {
 
 
 
+                const pRating = document.createElement('p');
+                pRating.textContent = 'Loading rating...';
+                pRating.style.color = '#ffc107'; // Amarillo tipo estrella
+                pRating.style.fontWeight = 'bold';
+                pRating.style.fontSize = '14px';
+                pRating.style.padding = '6px 12px';
+                pRating.style.background = 'rgba(0, 0, 0, 0.6)';
+                pRating.style.border = '1px solid #ffc107';
+                pRating.style.borderRadius = '10px';
+                pRating.style.textAlign = 'center';
+                pRating.style.marginTop = '8px';
+                pRating.style.boxShadow = '0 0 5px #ffc107aa';
 
 
 
-
+                fetch(`/users/rating/${game.id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.average_rating !== null) {
+                            pRating.textContent = `Rating ${parseFloat(data.average_rating).toFixed(1)} ⭐`;
+                        } else {
+                            divDetails.removeChild(pRating);
+                            pRating.textContent = '';
+                        }
+                    })
+                    .catch(() => {
+                        pRating.textContent = 'Error loading rating';
+                    });
 
 
 
@@ -369,6 +837,8 @@ function buscarJuego(value) {
                 div.appendChild(h2);
 
                 divDetails.appendChild(platformIconsDiv);
+                divDetails.appendChild(pRating);
+                divDetails.appendChild(genres);
 
 
                 div.appendChild(divDetails);

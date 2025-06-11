@@ -48,6 +48,21 @@ goBack.addEventListener('click', () => {
 
 })
 
+document.querySelectorAll('.platform-list li').forEach(item => {
+    item.addEventListener('click', () => {
+      const platform = item.getAttribute('data-platform');
+      // Redirige al dashboard con la plataforma como query param
+      window.location.href = `/dashboard?platform=${encodeURIComponent(platform)}`;
+    });
+  });
+
+  document.querySelectorAll('.genre-list li').forEach(item => {
+    item.addEventListener('click', () => {
+      const genre = item.getAttribute('data-genre');
+      window.location.href = `/dashboard?genre=${genre}`;
+    });
+  }); 
+
 
 
 buttonSearchGame.addEventListener('click', (e) => {

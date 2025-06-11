@@ -13,7 +13,7 @@ router.get('/mostrar', async (req, res) => {
 });
 
 router.get('/mostrarAll', async (req, res) => {
- 
+
 
   try {
     const juegos = await rawgApi.obtenerAllGames();
@@ -77,22 +77,55 @@ router.post('/busquedaJuego', async (req, res) => {
 
 
 
+
+
 router.post('/obtenerResenas', async (req, res) => {
 
   const { gameId } = req.body;
 
-  try{
+  try {
 
-    const result=await connBBDD.getReviews(gameId);
+    const result = await connBBDD.getReviews(gameId);
 
     res.json(result);
 
 
-  }catch(err){
+  } catch (err) {
 
-    res.status(500).json({error: 'Error obteniendo reseñas'});
+    res.status(500).json({ error: 'Error obteniendo reseñas' });
 
   }
+
+
+})
+
+router.post('/mostrarPorPlataformas', async (req, res) => {
+  const { platform } = req.body;
+
+  try {
+    const juegos = await rawgApi.obtenerJuegosPorPlataforma(platform);
+    res.json(juegos);
+  } catch (error) {
+    res.status(500).json({ error: 'No se pudieron obtener los juegos por plataforma' });
+  }
+});
+
+router.post('/filterByGenre', async (req, res) => {
+
+  const { genre } = req.body;
+
+  try{
+
+    const result = await rawgApi.obtenerJuegosPorGenero(genre);
+
+    res.json(result);
+
+  }catch(error){
+
+    res.status(500).json({ error: 'No se pudieron obtener los juegos por plataforma' })
+
+  }
+
 
 
 })
