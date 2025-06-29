@@ -2,17 +2,18 @@ const mysql = require('mysql2');
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+require('dotenv').config();
 
 
 
 
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'pixelrank'
+  host: process.env.DB_HOST,       // antes: 'localhost'
+  user: process.env.DB_USER,       // antes: 'root'
+  password: process.env.DB_PASSWORD, // antes: ''
+  database: process.env.DB_NAME,   // antes: 'pixelrank'
+  port: process.env.DB_PORT        // si usas puerto, si no puedes omitir
 });
-
 connection.connect((err) => {
   if (err) {
     console.error('Error al conectar a la base de datos:', err);
